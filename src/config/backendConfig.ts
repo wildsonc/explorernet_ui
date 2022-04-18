@@ -3,12 +3,17 @@ import SessionNode from 'supertokens-node/recipe/session';
 import { appInfo } from './appInfo';
 import { TypeInput } from 'supertokens-node/types';
 
+export const connectionURI =
+    process.env.SUPERTOKENS_URL || `https://try.supertokens.io`;
+
+export const apiKey = process.env.SUPERTOKENS_KEY || ``;
+
 export const backendConfig = (): TypeInput => {
     return {
         framework: 'express',
         supertokens: {
-            connectionURI: 'https://auth.explorernet.com.br',
-            apiKey: 'de2x7Q1JlvJyz3zdU87gIBYuyHphXj',
+            connectionURI,
+            apiKey,
         },
         appInfo,
         recipeList: [
@@ -48,9 +53,8 @@ export const backendConfig = (): TypeInput => {
                 },
                 providers: [
                     ThirdPartyEmailPasswordNode.Google({
-                        clientId:
-                            '472466091401-013l2cci5hd2a1q9jb9jhsni0cc53m13.apps.googleusercontent.com',
-                        clientSecret: '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',
+                        clientId: process.env.GOOGLE_CLIENT_ID || '',
+                        clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
                         scope: [
                             'https://www.googleapis.com/auth/userinfo.profile',
                         ],
