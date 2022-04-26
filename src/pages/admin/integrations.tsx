@@ -8,7 +8,13 @@ import {
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import React from "react";
-import { Box, BrandTelegram, BrandWhatsapp, Mail } from "tabler-icons-react";
+import {
+  Box,
+  BrandTelegram,
+  BrandWhatsapp,
+  Mail,
+  BrandDocker,
+} from "tabler-icons-react";
 import AutoSaveTextInput from "../../components/AutoSave/AutoSaveTextInput";
 import _3CXIcon from "../../components/Icons/3CXIcon";
 import _7AZIcon from "../../components/Icons/7AZIcon";
@@ -107,7 +113,7 @@ export default function ActionsGrid() {
     {
       title: "Telegram",
       icon: BrandTelegram,
-      color: "blue",
+      color: "cyan",
       children: (
         <>
           <AutoSaveTextInput label="BOT TOKEN" name="TELEGRAM_BOT_TOKEN" />
@@ -158,13 +164,19 @@ export default function ActionsGrid() {
       ),
     },
     {
-      title: "3CX",
-      icon: _3CXIcon,
-      color: "cyan",
+      title: "Portainer",
+      icon: BrandDocker,
+      color: "blue",
       children: (
         <>
-          <AutoSaveTextInput label="Usuário" name="3CX_USER" />
-          <AutoSaveTextInput label="Senha" name="3CX_PASSWORD" />
+          <AutoSaveTextInput label="Site" name="PORTAINER_URL" />
+          <AutoSaveTextInput label="Usuário" name="PORTAINER_USER" />
+          <AutoSaveTextInput
+            label="Senha"
+            type="password"
+            name="PORTAINER_PASS"
+          />
+          <AutoSaveTextInput label="Stack" name="PORTAINER_STACK" />
         </>
       ),
     },

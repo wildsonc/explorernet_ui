@@ -2,12 +2,10 @@ import {
     ActionIcon,
     Badge,
     Button,
-    Checkbox,
     Group,
     Modal,
     ScrollArea,
     Select,
-    Switch,
     Table,
     Text,
     TextInput,
@@ -27,33 +25,36 @@ import hasPermission from '../../services/utils/hasPermission';
 interface Props {
     id: number;
     name: string;
-    phone: string;
-    api_key: string;
-    namespace: string;
-    is_active: boolean;
+    host: string;
+    database: string;
+    user: string;
+    port: string;
+    driver: string;
     updated_at: string;
 }
 
 const initialValues = {
     name: '',
-    api_key: '',
-    namespace: '',
+    host: '',
+    database: '',
+    user: '',
+    port: '',
+    driver: '',
+    password: '',
 };
 
 function Database() {
     const { accessTokenPayload } = useSessionContext();
     const addForm = useForm({ initialValues });
-    const editForm = useForm({
-        initialValues: { ...initialValues, id: 0, is_active: true },
-    });
+    const editForm = useForm({ initialValues: { ...initialValues, id: 0 } });
     const modals = useModals();
     const [opened, setOpened] = useState(false);
     const [openedEdit, setOpenedEdit] = useState(false);
 
     const { data, refetch } = useQuery<Props[], Error>(
-        'dialog',
+        'database',
         async () => {
-            const response = await api.get(`api/whatsapp/dialog`);
+            const response = await api.get(`api/database`);
             return response.data;
         },
         {
@@ -90,7 +91,7 @@ function Database() {
             onConfirm: () => deleteDatabase(e),
         });
     const deleteDatabase = async (e: Props) => {
-        const response = await api.delete(`api/whatsapp/dialog/${e.id}`);
+        const response = await api.delete(`api/database/${e.id}`);
         showNotification({
             title: 'Deletado',
             message: e.name,
@@ -100,14 +101,14 @@ function Database() {
     };
 
     const handleSubmit = async (values: typeof addForm.values) => {
-        await api.post(`api/whatsapp/dialog`, values);
+        await api.post(`api/database`, values);
         refetch();
         setOpened(false);
         addForm.reset();
     };
 
     const handleEditSubmit = async (values: typeof editForm.values) => {
-        await api.put(`api/whatsapp/dialog/${values.id}`, values);
+        await api.put(`api/database/${values.id}`, values);
         refetch();
         setOpenedEdit(false);
         editForm.reset();
@@ -120,17 +121,49 @@ function Database() {
                 {...addForm.getInputProps('name')}
                 required
             />
-            <TextInput
-                label="Api key"
+            <Select
+                label="Driver"
                 required
-                {...addForm.getInputProps('api_key')}
+                data={['postgres']}
+                {...addForm.getInputProps('driver')}
             />
             <TextInput
-                label="Namespace"
+                label="Host"
                 required
-                {...addForm.getInputProps('namespace')}
+                placeholder="localhost"
+                {...addForm.getInputProps('host')}
+            />
+            <TextInput
+                label="Database"
+                required
+                placeholder="postgres"
+                {...addForm.getInputProps('database')}
+            />
+            <TextInput
+                label="User"
+                required
+                {...addForm.getInputProps('user')}
+            />
+            <TextInput
+                label="Senha"
+                type="password"
+                required
+                {...addForm.getInputProps('password')}
+            />
+            <TextInput
+                label="Porta"
+                required
+                placeholder="5432"
+                {...addForm.getInputProps('port')}
             />
             <Group position="right" mt={20}>
+                <Button
+                    variant="outline"
+                    color="orange"
+                    onClick={() => testConnection(addForm.values)}
+                >
+                    Testar
+                </Button>
                 <Button variant="filled" color="green" type="submit">
                     Salvar
                 </Button>
@@ -144,23 +177,89 @@ function Database() {
                 {...editForm.getInputProps('name')}
                 required
             />
-            <TextInput
-                label="Api key"
+            <Select
+                label="Driver"
                 required
-                {...editForm.getInputProps('api_key')}
+                data={['postgres']}
+                {...editForm.getInputProps('driver')}
             />
             <TextInput
-                label="Namespace"
+                label="Host"
                 required
-                {...editForm.getInputProps('namespace')}
+                placeholder="localhost"
+                {...editForm.getInputProps('host')}
+            />
+            <TextInput
+                label="Database"
+                required
+                placeholder="postgres"
+                {...editForm.getInputProps('database')}
+            />
+            <TextInput
+                label="User"
+                required
+                {...editForm.getInputProps('user')}
+            />
+            <TextInput
+                label="Senha"
+                type="password"
+                required
+                {...editForm.getInputProps('password')}
+            />
+            <TextInput
+                label="Porta"
+                required
+                placeholder="5432"
+                {...editForm.getInputProps('port')}
             />
             <Group position="right" mt={20}>
+                <Button
+                    variant="outline"
+                    color="orange"
+                    onClick={() => testConnection(editForm.values)}
+                >
+                    Testar
+                </Button>
                 <Button variant="filled" color="green" type="submit">
                     Salvar
                 </Button>
             </Group>
         </form>
     );
+
+    const testConnection = async (values: any) => {
+        const response = await api.post(`api/database-test`, values);
+        console.log(response.data);
+        if (response.data.status == 'Error') {
+            showNotification({
+                title: 'Falhou',
+                message: response.data.message,
+                color: 'red',
+            });
+        } else if (response.data.status == 'OK') {
+            showNotification({
+                title: 'Sucesso',
+                message: 'Conexão bem sucedida',
+                color: 'green',
+            });
+        }
+    };
+
+    const openAddModal = () =>
+        modals.openModal({
+            title: <Title order={3}>Adicionar novo banco</Title>,
+            centered: true,
+            children: addFormContent,
+        });
+
+    const updateDatabase = async (e: Props) => {
+        // const response = await api.put(`api/database/${e.id}`)
+        showNotification({
+            title: 'Salvo',
+            message: e.name,
+            color: 'green',
+        });
+    };
 
     const rows = data.map((item) => (
         <tr key={item.id}>
@@ -171,16 +270,17 @@ function Database() {
             </td>
 
             <td>
+                <Badge>{item.driver}</Badge>
+            </td>
+            <td>
                 <Text size="sm" weight={500}>
-                    {item.phone}
+                    {item.host}
                 </Text>
             </td>
             <td>
-                {item.is_active ? (
-                    <Badge color="green">ATIVO</Badge>
-                ) : (
-                    <Badge color="red">INATIVO</Badge>
-                )}
+                <Text size="sm" weight={500}>
+                    {item.database}
+                </Text>
             </td>
             <td>
                 <Text size="sm" weight={500}>
@@ -191,7 +291,7 @@ function Database() {
                 <Group spacing={0} position="left">
                     <ActionIcon
                         onClick={() => {
-                            editForm.setValues({ ...item });
+                            editForm.setValues({ ...item, password: '' });
                             setOpenedEdit(true);
                         }}
                     >
@@ -218,8 +318,9 @@ function Database() {
                     <thead>
                         <tr>
                             <th>Nome</th>
-                            <th>Telefone</th>
-                            <th>Status</th>
+                            <th>Driver</th>
+                            <th>Host</th>
+                            <th>Database</th>
                             <th>Atualizado</th>
                             <th />
                         </tr>
@@ -228,14 +329,14 @@ function Database() {
                 </Table>
             </ScrollArea>
             <Modal
-                title={<Title order={3}>Adicionar empresa</Title>}
+                title={<Title order={3}>Adicionar fonte de dados</Title>}
                 opened={opened}
                 onClose={() => setOpened(false)}
             >
                 {addFormContent}
             </Modal>
             <Modal
-                title={<Title order={3}>Editar empresa</Title>}
+                title={<Title order={3}>Editar fonte de dados</Title>}
                 opened={openedEdit}
                 onClose={() => setOpenedEdit(false)}
             >
