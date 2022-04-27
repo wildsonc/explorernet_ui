@@ -50,12 +50,6 @@ export const listItems = [
                 role: 'view_noc',
                 description: 'NOC → Mapa',
             },
-            // {
-            //   label: "Histórico",
-            //   link: "/noc/history",
-            //   role: "view_noc",
-            //   description: "NOC → Histórico de notificações",
-            // },
             {
                 label: 'Configurações',
                 link: '/noc/settings',
@@ -125,10 +119,10 @@ export const listItems = [
                 description: 'Admin → Integrações',
             },
             {
-                label: 'Logs',
-                link: '/admin/logs',
+                label: 'Rotinas',
+                link: '/admin/routines',
                 role: 'admin',
-                description: 'Admin → Logs',
+                description: 'Admin → Rotinas',
             },
         ],
     },
