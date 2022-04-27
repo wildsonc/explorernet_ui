@@ -1,13 +1,6 @@
-import { Timeline, Text, ActionIcon, Group, Button } from '@mantine/core';
+import { Timeline, Text, Button, ScrollArea } from '@mantine/core';
 import { useQuery } from 'react-query';
-import {
-    Plus,
-    Pencil,
-    Check,
-    MapPin,
-    AlertTriangle,
-    Urgent,
-} from 'tabler-icons-react';
+import { MapPin, Urgent } from 'tabler-icons-react';
 import api from '../../services/api';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -77,8 +70,10 @@ export default function DrawerActiveContent({ mapRef }: any) {
     });
 
     return (
-        <Timeline active={10} bulletSize={26} lineWidth={4}>
-            {items}
-        </Timeline>
+        <ScrollArea sx={{ height: '100%' }}>
+            <Timeline active={10} bulletSize={26} lineWidth={4}>
+                {items}
+            </Timeline>
+        </ScrollArea>
     );
 }

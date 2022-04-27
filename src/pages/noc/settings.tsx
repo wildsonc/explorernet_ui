@@ -44,20 +44,34 @@ export default function Settings() {
                 sx={{ margin: 10, maxWidth: 200 }}
             />
             <Divider size="sm" label={whatsappTitle} sx={{ paddingTop: 10 }} />
-            <AutoSaveTextInput
-                label="HSM - Notificação"
-                name="NOC_HSM"
-                sx={{ margin: 10, maxWidth: 200 }}
-            />
-            <AutoSaveTextInput
-                label="HSM - Prorrogação"
-                name="NOC_HSM_EXTEND"
-                sx={{ margin: 10, maxWidth: 200 }}
-            />
+            <Group>
+                <AutoSaveTextInput
+                    label="HSM - Notificação"
+                    name="NOC_HSM"
+                    sx={{ margin: 10, maxWidth: 300 }}
+                />
+                <AutoSaveTextInput
+                    label="Previsão"
+                    name="NOC_HSM_TIME"
+                    sx={{ margin: 10, maxWidth: 150 }}
+                />
+            </Group>
+            <Group>
+                <AutoSaveTextInput
+                    label="HSM - Prorrogação"
+                    name="NOC_HSM_EXTEND"
+                    sx={{ margin: 10, maxWidth: 300 }}
+                />
+                <AutoSaveTextInput
+                    label="Previsão"
+                    name="NOC_HSM_EXTEND_TIME"
+                    sx={{ margin: 10, maxWidth: 150 }}
+                />
+            </Group>
             <AutoSaveTextInput
                 label="HSM - Resolvido"
                 name="NOC_HSM_RESOLVED"
-                sx={{ margin: 10, maxWidth: 200 }}
+                sx={{ margin: 10, maxWidth: 300 }}
             />
         </>
     );

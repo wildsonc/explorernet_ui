@@ -51,6 +51,7 @@ const groupColors: any = {
     support: { color: 'pink', label: 'ServiceDesk' },
     admin: { color: 'cyan', label: 'Admin' },
     noc: { color: 'violet', label: 'NOC' },
+    support2: { color: 'lime', label: 'Nível 2' },
 };
 
 export default function UsersTable() {

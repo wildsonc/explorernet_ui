@@ -14,8 +14,9 @@ import api from '../../services/api';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import { formatDate } from '../../services/utils/formatDate';
-import { useState } from 'react';
+import { useModals } from '@mantine/modals';
 import { useForm } from '@mantine/form';
+import { number } from 'zod';
 
 interface Props {
     onClose: (v: boolean) => void;
@@ -25,7 +26,7 @@ interface Props {
 }
 
 export default function AreaModal({ onClose, open, data, refetch }: Props) {
-    const [opened, setOpened] = useState(false);
+    const modals = useModals();
     const form = useForm({ initialValues: { time: '1', time_type: 'horas' } });
     if (!data) return null;
     const resolve = async (id: number) => {
@@ -36,7 +37,6 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
     const extend = async (id: number) => {
         await api.put(`api/noc/notification/extend/${id}`, form.values);
         refetch();
-        setOpened(false);
         onClose(false);
     };
 
@@ -44,22 +44,32 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
     moment.locale('pt-br');
     const created_at = moment(data.created_at).fromNow();
 
-    const select = (
-        <NativeSelect
-            data={['horas', 'minutos']}
-            {...form.getInputProps('time_type')}
-            styles={{
-                input: {
-                    fontWeight: 500,
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                },
-            }}
-        />
-    );
+    const openExtendModal = () =>
+        modals.openConfirmModal({
+            title: <Title order={3}>Prorrogar</Title>,
+            children: <Text>Você confirma esta ação?</Text>,
+            labels: { confirm: 'Confirmar', cancel: 'Cancelar' },
+            confirmProps: { color: 'red' },
+            onConfirm: () => extend(data.id),
+            centered: true,
+        });
+    const openResolveModal = () =>
+        modals.openConfirmModal({
+            title: <Title order={3}>Normalizar</Title>,
+            children: <Text>Você confirma esta ação?</Text>,
+            labels: { confirm: 'Confirmar', cancel: 'Cancelar' },
+            confirmProps: { color: 'green' },
+            onConfirm: () => resolve(data.id),
+            centered: true,
+        });
 
     return (
-        <Modal opened={open} onClose={() => onClose(false)} title={title}>
+        <Modal
+            opened={open}
+            onClose={() => onClose(false)}
+            title={title}
+            zIndex={1}
+        >
             <Text>{data.description}</Text>
             <Text>
                 <strong>Usuários afetados:</strong>{' '}
@@ -87,44 +97,19 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
                     <Button
                         variant="outline"
                         color="orange"
-                        onClick={() => setOpened(true)}
+                        onClick={openExtendModal}
                     >
                         Prorrogar
                     </Button>
                     <Button
                         variant="filled"
                         color="green"
-                        onClick={() => resolve(data.id)}
+                        onClick={openResolveModal}
                     >
                         Resolver
                     </Button>
                 </Group>
             </Group>
-            <Modal
-                opened={opened}
-                centered
-                onClose={() => setOpened(false)}
-                title={<Title order={4}>Prorrogar</Title>}
-            >
-                <Stack align="center">
-                    <TextInput
-                        type="number"
-                        placeholder="1"
-                        rightSection={select}
-                        sx={{ width: 200 }}
-                        rightSectionWidth={100}
-                        {...form.getInputProps('time')}
-                    />
-                    <Button
-                        variant="outline"
-                        color="orange"
-                        mt={15}
-                        onClick={() => extend(data.id)}
-                    >
-                        Prorrogar
-                    </Button>
-                </Stack>
-            </Modal>
         </Modal>
     );
 }

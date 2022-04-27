@@ -27,10 +27,8 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
         initialValues: {
             title: '',
             description: '',
-            time: '1',
-            time_type: 'horas',
-            telegram: true,
-            whatsapp: false,
+            telegram: false,
+            whatsapp: true,
             sms: false,
             custumers: selectedPoints,
             polygon: polygon,
@@ -65,20 +63,6 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
         setActive((current) => (current < 3 ? current + 1 : current));
     const prevStep = () =>
         setActive((current) => (current > 0 ? current - 1 : current));
-
-    const select = (
-        <NativeSelect
-            data={['horas', 'minutos']}
-            {...form.getInputProps('time_type')}
-            styles={{
-                input: {
-                    fontWeight: 500,
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                },
-            }}
-        />
-    );
 
     return (
         <>
@@ -157,15 +141,6 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
                                         label="Descrição"
                                         required
                                         {...form.getInputProps('description')}
-                                    />
-                                    <TextInput
-                                        type="number"
-                                        placeholder="1"
-                                        label="Previsão"
-                                        rightSection={select}
-                                        sx={{ width: 200 }}
-                                        rightSectionWidth={100}
-                                        {...form.getInputProps('time')}
                                     />
                                 </Container>
                             </Center>

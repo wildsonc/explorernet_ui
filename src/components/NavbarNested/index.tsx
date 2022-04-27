@@ -38,6 +38,10 @@ export function NavbarNested() {
     const roles = accessTokenPayload.roles;
     const user = accessTokenPayload.user;
 
+    if (!user.email) {
+        location.reload();
+    }
+
     const actions: SpotlightAction[] = [];
     listItems.map((i) => {
         return i.links.map((e) => {
