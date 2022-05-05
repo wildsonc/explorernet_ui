@@ -16,6 +16,7 @@ import {
     Checkbox,
     createStyles,
     Table,
+    Divider,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -113,7 +114,8 @@ const Negotiation = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [usedDays, setUsedDays] = useState(0);
     const [sliderValue, setSliderValue] = useState(0);
-    const [totalPrice, setTotalPrice] = useState('');
+    const [interest, setInterest] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
     const [nextDate, setNextDate] = useState<Date | null>(new Date());
     const searchForm = useForm({
         initialValues: {
@@ -139,14 +141,27 @@ const Negotiation = () => {
         if (form.values.nextDays) {
             total += (days * data.custumer.access_plan_price) / 30;
         }
+        let newInterest = 0;
         data.invoices.forEach((e) => {
             if (selection.includes(e.id)) {
                 total += e.value;
+                const days = dateDiff(new Date(e.due_date));
+                newInterest += e.value * 0.02 + e.value * days * 0.01;
+                console.log(days, newInterest);
             }
         });
-
-        setTotalPrice(total.toFixed(2));
+        setInterest(newInterest);
+        setTotalPrice(total);
     }, [form.values, usedDays, nextDate, selection]);
+
+    const dateDiff = (date: Date | null) => {
+        const a = moment(date);
+        const days = a.diff(moment().startOf('day'), 'days');
+        if (days == 0) return 0;
+        if (days < -1) return days * -1 + 1;
+        if (days < 0) return days * -1;
+        return days + 1;
+    };
 
     const items = useMemo(() => {
         return data?.history?.map((e) => {
@@ -165,13 +180,6 @@ const Negotiation = () => {
             );
         });
     }, [data?.history]);
-
-    const dateDiff = (date: Date | null) => {
-        const a = moment(date);
-        const days = a.diff(moment().startOf('day'), 'days');
-        if (days == 0) return 0;
-        return days + 1;
-    };
 
     const roles = accessTokenPayload.roles;
 
@@ -416,19 +424,60 @@ const Negotiation = () => {
                                     />
                                 </Group>
                             </Group>
-                            <Group mt={10} position="center">
-                                <Badge size="lg" color="green">
-                                    Total
-                                </Badge>
-                                <Text size="lg">
-                                    <strong>R$ {totalPrice}</strong>
-                                    <Text color="dimmed">
-                                        2x {(Number(totalPrice) / 2).toFixed(2)}
+                            <Group mt={-10} position="center" align="start">
+                                <Group direction="column" position="center">
+                                    <Badge size="lg" color="green" mb={-10}>
+                                        Total
+                                    </Badge>
+                                    <strong>R$ {totalPrice.toFixed(2)}</strong>
+                                </Group>
+                                <Group direction="column" position="center">
+                                    <Badge size="lg" color="lime" mb={-10}>
+                                        À vista
+                                    </Badge>
+                                    <Text weight={500}>
+                                        R$ {(totalPrice * 0.95).toFixed(2)}
                                     </Text>
-                                    <Text color="dimmed">
-                                        3x {(Number(totalPrice) / 3).toFixed(2)}
+                                    <Text mt={-20} color="green" weight={700}>
+                                        - {(totalPrice * 0.05).toFixed(2)}
                                     </Text>
-                                </Text>
+                                </Group>
+                                <Group direction="column" position="center">
+                                    <Badge size="lg" color="grape" mb={-10}>
+                                        2X
+                                    </Badge>
+                                    <Text weight={500}>
+                                        R$ {totalPrice.toFixed(2)}
+                                    </Text>
+                                    <Text mt={-20} color="dimmed" weight={500}>
+                                        2x {(totalPrice * 0.5).toFixed(2)}
+                                    </Text>
+                                </Group>
+                                <Group direction="column" position="center">
+                                    <Badge size="lg" color="red" mb={-10}>
+                                        3X
+                                    </Badge>
+                                    <Text weight={500}>
+                                        R$ {(interest + totalPrice).toFixed(2)}
+                                    </Text>
+                                    <Text mt={-20} color="red" weight={700}>
+                                        + {interest.toFixed(2)}
+                                    </Text>
+                                    <Text mt={-20} color="dimmed" weight={500}>
+                                        Entrada{' '}
+                                        {(
+                                            (interest + totalPrice) *
+                                            0.4
+                                        ).toFixed(2)}
+                                    </Text>
+                                    <Text mt={-20} color="dimmed" weight={500}>
+                                        2x{' '}
+                                        {(
+                                            ((interest + totalPrice) * 0.6) /
+                                            2
+                                        ).toFixed(2)}
+                                    </Text>
+                                </Group>
                             </Group>
                         </>
                     )}
