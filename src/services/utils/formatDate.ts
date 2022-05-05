@@ -1,4 +1,5 @@
-export const formatDate = (date: string) => {
-    let newDate = new Date(date).toLocaleString().substring(0, 16);
-    return newDate;
+export const formatDate = (date: string, hours = true) => {
+    let newDate = new Date(date);
+    if (hours) return newDate.toLocaleString().substring(0, 16);
+    return newDate.toLocaleDateString().substring(0, 10);
 };

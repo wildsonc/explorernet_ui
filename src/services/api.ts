@@ -6,6 +6,9 @@ const api = axios.create({
     headers: {
         'Content-type': 'application/json',
     },
+    validateStatus: (status: number) => {
+        return (status >= 200 && status < 300) || status == 404;
+    },
 });
 
 Session.addAxiosInterceptors(api);

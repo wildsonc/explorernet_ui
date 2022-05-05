@@ -1,11 +1,4 @@
-import {
-    Timeline,
-    Text,
-    ActionIcon,
-    Group,
-    Button,
-    ScrollArea,
-} from '@mantine/core';
+import { Timeline, Text, Group, Button, ScrollArea } from '@mantine/core';
 import { useQuery } from 'react-query';
 import { Plus, Pencil, Check, MapPin } from 'tabler-icons-react';
 import api from '../../services/api';

@@ -10,15 +10,9 @@ import {
     useMantineColorScheme,
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
-import { ExtendedFeature, GeoGeometryObjects } from 'd3-geo';
+import { ExtendedFeature } from 'd3-geo';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
     CircleLayer,
     FillLayer,
@@ -41,12 +35,9 @@ import {
     User,
     X,
 } from 'tabler-icons-react';
-import DrawControl from '../../components/Controls/draw-control';
 import NotAuthorized from '../../components/ErrorPage/NotAuthorized';
 import Legend from '../../components/Map/Legend';
 import Tooltip from '../../components/Map/Tooltip';
-import AreaControl from '../../components/NOC/AreaControl';
-import AreaModal from '../../components/NOC/AreaModal';
 import DrawerActiveContent from '../../components/NOC/DrawerActiveContent';
 import DrawerContent from '../../components/NOC/DrawerContent';
 import api from '../../services/api';
@@ -75,11 +66,8 @@ interface ICategory {
 
 export default function Mapa() {
     const { colorScheme } = useMantineColorScheme();
-    const [polygon, setPolygon] = useState<GeoGeometryObjects>();
-    const [opened, setOpened] = useState(false);
     const [drawerOpened, setDrawerOpened] = useState(false);
     const [drawerActiveOpened, setDrawerActiveOpened] = useState(false);
-    const [areaSelected, setAreaSelected] = useState();
     const [categories, setCategories] = useState<ICategory>();
     const [hoverInfo, setHoverInfo] = useState<ITooltip>();
     const [username, setUsername] = useState('');
@@ -118,11 +106,7 @@ export default function Mapa() {
 
     const onClick = async (event: MapLayerMouseEvent) => {
         const feature = event?.features;
-        if (feature && feature[0].layer.id == 'area') {
-            api.get(`api/noc/notification/${feature[0].id}`)
-                .then((response) => setAreaSelected(response.data))
-                .then(() => setOpened(true));
-        } else if (feature && feature[0].layer.id == 'point') {
+        if (feature && feature[0].layer.id == 'point') {
             clipboard.copy(feature[0].properties?.username);
             showNotification({
                 message: 'Username copiado!',
@@ -141,26 +125,6 @@ export default function Mapa() {
 
             setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
         }
-    }, []);
-
-    const onUpdate = useCallback((e) => {
-        setPolygon((currFeatures) => {
-            const newFeatures: any = { ...currFeatures };
-            for (const f of e.features) {
-                newFeatures[f.id] = f;
-            }
-            return newFeatures;
-        });
-    }, []);
-
-    const onDelete = useCallback((e) => {
-        setPolygon((currFeatures) => {
-            const newFeatures: any = { ...currFeatures };
-            for (const f of e.features) {
-                delete newFeatures[f.id];
-            }
-            return newFeatures;
-        });
     }, []);
 
     const dark = colorScheme === 'dark';
@@ -276,7 +240,7 @@ export default function Mapa() {
 
     const roles = accessTokenPayload.roles;
 
-    if (!hasPermission('view_noc', roles)) {
+    if (!hasPermission('view_support', roles)) {
         return <NotAuthorized />;
     }
 
@@ -334,17 +298,6 @@ export default function Mapa() {
                         </Source>
                     )}
                     <FullscreenControl position="top-left" />
-                    <DrawControl
-                        position="top-left"
-                        displayControlsDefault={false}
-                        controls={{
-                            polygon: true,
-                            trash: true,
-                        }}
-                        onCreate={onUpdate}
-                        onUpdate={onUpdate}
-                        onDelete={onDelete}
-                    />
                     <NavigationControl position="top-left" />
                     {hoverInfo && (
                         <Tooltip x={hoverInfo.x + 15} y={hoverInfo.y - 30}>
@@ -442,11 +395,6 @@ export default function Mapa() {
                         }}
                     />
                 )}
-                <AreaControl
-                    dataMap={dataMap}
-                    polygon={polygon}
-                    refetch={refetch}
-                />
                 {categories && (
                     <Legend
                         categories={categories}
@@ -454,14 +402,6 @@ export default function Mapa() {
                     />
                 )}
             </div>
-            {areaSelected && (
-                <AreaModal
-                    onClose={setOpened}
-                    open={opened}
-                    data={areaSelected}
-                    refetch={refetch}
-                />
-            )}
             <Drawer
                 opened={drawerOpened}
                 onClose={() => setDrawerOpened(false)}

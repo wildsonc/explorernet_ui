@@ -5,6 +5,7 @@ import {
     Circle2,
     Headset,
     Coin,
+    UserCheck,
 } from 'tabler-icons-react';
 
 export const listItems = [
@@ -12,13 +13,64 @@ export const listItems = [
         label: 'Suporte',
         icon: Headset,
         role: 'view_support',
-        links: [],
+        links: [
+            {
+                label: 'Mapa',
+                link: '/support/map',
+                role: 'view_support',
+                description: 'Suporte → Mapa',
+            },
+        ],
     },
     {
         label: 'Financeiro',
         icon: Coin,
         role: 'view_finance',
-        links: [],
+        links: [
+            {
+                label: 'Negociação',
+                link: '/finance/negotiation',
+                role: 'view_finance',
+                description: 'Financeiro → Negociação',
+            },
+            {
+                label: 'Mudança de plano',
+                link: '/finance/access_plan',
+                role: 'view_finance',
+                description: 'Financeiro → Mudança de plano',
+            },
+            {
+                label: 'Mudança de endereço',
+                link: '/finance/address',
+                role: 'view_finance',
+                description: 'Financeiro → Mudança de endereço',
+            },
+            {
+                label: 'Configurações',
+                link: '/finance/settings',
+                role: 'admin',
+                description: 'Financeiro → Configurações',
+            },
+        ],
+    },
+    {
+        label: 'Retenção',
+        icon: UserCheck,
+        role: 'view_retention',
+        links: [
+            {
+                label: 'Cancelamento',
+                link: '/retention/cancel',
+                role: 'view_retention',
+                description: 'Retenção → Cancelamento',
+            },
+            {
+                label: 'Configurações',
+                link: '/retention/settings',
+                role: 'admin',
+                description: 'Retenção → Configurações',
+            },
+        ],
     },
     {
         label: 'Nível 2',

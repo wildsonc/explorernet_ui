@@ -209,6 +209,8 @@ function insidePolygon(polygon: any, dataRaw: any) {
             }
         });
         newData = newData.map((e: any) => e.properties);
+        const custumers = newData.map((e: any) => e.username);
+        console.log(custumers);
         return newData;
     }
 

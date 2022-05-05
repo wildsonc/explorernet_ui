@@ -60,6 +60,7 @@ function Docs() {
     const { colorScheme } = useMantineColorScheme();
     const [hoverInfo, setHoverInfo] = useState<ITooltip>();
     const [cto, setCto] = useState('');
+    const [coordinate, setCoordinate] = useState('');
     const [cities, setCities] = useState<string[]>();
     const [debouncedCto] = useDebouncedValue(cto, 200);
     const [drawerOpened, setDrawerOpened] = useState(false);
@@ -331,6 +332,34 @@ function Docs() {
             </Paper>
             <FullscreenControl position="top-right" />
             <NavigationControl position="top-right" />
+            <Autocomplete
+                icon={<Search size={14} />}
+                onChange={setCoordinate}
+                value={coordinate}
+                data={[coordinate]}
+                onItemSubmit={(e) => {
+                    const c = e.value.split(',');
+                    try {
+                        const lat = Number(c[0]);
+                        const lon = Number(c[1]);
+                        Fly([lon, lat]);
+                    } catch {
+                        showNotification({
+                            title: 'Localização inválida',
+                            message: 'Exemplo: -16.31809,-48.96837',
+                            color: 'red',
+                        });
+                    }
+                }}
+                placeholder="Coordenadas"
+                sx={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 270,
+                    borderRadius: 5,
+                    minWidth: 200,
+                }}
+            />
             <Autocomplete
                 onChange={setCto}
                 value={cto}
