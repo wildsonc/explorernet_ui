@@ -16,7 +16,6 @@ import {
     Checkbox,
     createStyles,
     Table,
-    Divider,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -306,7 +305,7 @@ const Negotiation = () => {
                     />
                 </Group>
             </form>
-            <Title mt={10} order={2}>
+            <Title mt={5} mb={-10} order={2}>
                 Negociação
             </Title>
             <Grid>
@@ -424,7 +423,7 @@ const Negotiation = () => {
                                     />
                                 </Group>
                             </Group>
-                            <Group mt={-10} position="center" align="start">
+                            <Group mt={-5} position="center" align="start">
                                 <Group direction="column" position="center">
                                     <Badge size="lg" color="green" mb={-10}>
                                         Total

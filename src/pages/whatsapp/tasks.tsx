@@ -25,7 +25,6 @@ import NotAuthorized from '../../components/ErrorPage/NotAuthorized';
 import api from '../../services/api';
 import hasPermission from '../../services/utils/hasPermission';
 import { parseExpression } from 'cron-parser';
-import { DatePicker } from '@mantine/dates';
 
 interface Crontab {
     minute: string;
@@ -312,15 +311,14 @@ function Database() {
     );
 
     const getCrontab = (i: Crontab) => {
-        return `${i.minute} 
-                ${i.hour} 
-                ${i.day_of_week} 
-                ${i.day_of_month} 
-                ${i.month_of_year}`;
+        return `${i.minute} ${i.hour} ${i.day_of_week} ${i.day_of_month} ${i.month_of_year}`;
     };
 
     const getNextRun = (crontab: Crontab) => {
-        const interval = parseExpression(getCrontab(crontab));
+        const c = getCrontab(crontab).split(' ');
+        const interval = parseExpression(
+            `${c[0]} ${c[1]} ${c[3]} ${c[4]} ${c[2]}`
+        );
         return interval.next().toString();
     };
 
