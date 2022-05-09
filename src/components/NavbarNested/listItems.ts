@@ -122,6 +122,12 @@ export const listItems = [
                 description: 'Whatsapp → Painel',
             },
             {
+                label: 'Envio em lote',
+                link: '/whatsapp/message',
+                role: 'admin',
+                description: 'Whatsapp → Envio em lote',
+            },
+            {
                 label: 'Resultados',
                 link: '/whatsapp/results',
                 role: 'admin',

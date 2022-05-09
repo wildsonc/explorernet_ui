@@ -147,12 +147,7 @@ function Query() {
                 );
             });
             await api.get('api/whatsapp/dialog').then((res) => {
-                setCompanies(
-                    res.data.map((e: DatabaseProps) => ({
-                        value: e.id,
-                        label: e.name,
-                    }))
-                );
+                setCompanies(res.data.map((e: DatabaseProps) => e.name));
                 form.setFieldValue('company', res.data[0].id);
             });
         };

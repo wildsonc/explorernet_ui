@@ -146,7 +146,6 @@ const Negotiation = () => {
                 total += e.value;
                 const days = dateDiff(new Date(e.due_date));
                 newInterest += e.value * 0.02 + e.value * days * 0.01;
-                console.log(days, newInterest);
             }
         });
         setInterest(newInterest);
@@ -453,8 +452,19 @@ const Negotiation = () => {
                                     </Text>
                                 </Group>
                                 <Group direction="column" position="center">
-                                    <Badge size="lg" color="red" mb={-10}>
+                                    <Badge size="lg" color="indigo" mb={-10}>
                                         3X
+                                    </Badge>
+                                    <Text weight={500}>
+                                        R$ {totalPrice.toFixed(2)}
+                                    </Text>
+                                    <Text mt={-20} weight={500} color="dimmed">
+                                        3x {(totalPrice / 3).toFixed(2)}
+                                    </Text>
+                                </Group>
+                                <Group direction="column" position="center">
+                                    <Badge size="lg" color="red" mb={-10}>
+                                        1+2X
                                     </Badge>
                                     <Text weight={500}>
                                         R$ {(interest + totalPrice).toFixed(2)}
