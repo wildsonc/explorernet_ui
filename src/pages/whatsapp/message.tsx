@@ -149,7 +149,9 @@ export default function DropzoneButton() {
                 const result = reader.result;
                 if (typeof result == 'string' && file.type == 'text/csv') {
                     //@ts-ignore
-                    setContacts(readString(result).data);
+                    let lines = readString(result).data;
+                    if (isNaN(lines[0][0])) lines.shift();
+                    setContacts(lines);
                 } else {
                     const workbook = read(result, { type: 'binary' });
                     workbook.SheetNames.forEach(function (sheetName) {
@@ -158,7 +160,8 @@ export default function DropzoneButton() {
                             workbook.Sheets[sheetName]
                         );
                         //@ts-ignore
-                        const lines = readString(csv).data;
+                        let lines = readString(csv).data;
+                        if (isNaN(lines[0][0])) lines.shift();
                         setContacts(lines);
                     });
                 }
