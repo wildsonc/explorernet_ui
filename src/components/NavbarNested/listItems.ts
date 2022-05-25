@@ -6,6 +6,7 @@ import {
     Headset,
     Coin,
     UserCheck,
+    Ad2,
 } from 'tabler-icons-react';
 
 export const listItems = [
@@ -73,6 +74,25 @@ export const listItems = [
         ],
     },
     {
+        label: 'Marketing',
+        icon: Ad2,
+        role: 'view_marketing',
+        links: [
+            {
+                label: 'Envio em lote',
+                link: '/marketing/message',
+                role: 'view_marketing',
+                description: 'Marketing → Envio em lote',
+            },
+            {
+                label: 'Mapa',
+                link: '/marketing/map',
+                role: 'view_marketing',
+                description: 'Marketing → Mapa',
+            },
+        ],
+    },
+    {
         label: 'Nível 2',
         icon: Circle2,
         role: 'view_support2',
@@ -121,12 +141,7 @@ export const listItems = [
                 role: 'admin',
                 description: 'Whatsapp → Painel',
             },
-            {
-                label: 'Envio em lote',
-                link: '/whatsapp/message',
-                role: 'admin',
-                description: 'Whatsapp → Envio em lote',
-            },
+
             {
                 label: 'Resultados',
                 link: '/whatsapp/results',

@@ -1,7 +1,7 @@
 import { ActionIcon, Anchor, Box, Group, List } from '@mantine/core';
 import { Square, SquareCheck } from 'tabler-icons-react';
 
-interface ICategory {
+interface Category {
     [key: string]: {
         enabled: boolean;
         color?: string;
@@ -9,7 +9,7 @@ interface ICategory {
 }
 
 interface Props {
-    categories: ICategory;
+    categories: Category;
     setCategories: (arg0: any) => void;
 }
 
@@ -26,28 +26,32 @@ export default function legend({ categories, setCategories }: Props) {
         };
 
         // if all categories are disabled, enable all -- similar to nvd3
-        if (Object.values(newCategories).every((v) => !v.enabled)) {
-            /* eslint-disable no-param-reassign */
-            Object.values(newCategories).forEach((v) => {
-                v.enabled = true;
-            });
-        }
+        // if (Object.values(newCategories).every((v) => !v.enabled)) {
+        //     /* eslint-disable no-param-reassign */
+        //     Object.values(newCategories).forEach((v) => {
+        //         v.enabled = true;
+        //     });
+        // }
         setCategories(newCategories);
     };
 
     const showSingleCategory = (k: string) => {
         if (!categories) return null;
         const newCategories = categories;
-        /* eslint-disable no-param-reassign */
         Object.values(newCategories).forEach((v) => {
             v.enabled = false;
         });
         newCategories[k].enabled = true;
+        console.log(newCategories);
         setCategories(newCategories);
     };
 
     const legend = Object.entries(categories || {}).map(([k, v]) => {
-        const icon = v.enabled ? <SquareCheck /> : <Square />;
+        const icon = v.enabled ? (
+            <SquareCheck color={v.color} />
+        ) : (
+            <Square color={v.color} />
+        );
         return (
             <List.Item key={k} sx={{ listStyleType: 'none' }}>
                 <Anchor

@@ -63,7 +63,7 @@ const ChangePlan = () => {
     const [isLoadingDocument, setIsLoadingDocument] = useState(false);
     const [price, setPrice] = useState(0);
     const [accessPlan, setAccessPlan] = useState('');
-    let { accessTokenPayload } = useSessionContext();
+    const { accessTokenPayload } = useSessionContext();
     const modals = useModals();
     const searchForm = useForm({
         initialValues: {
