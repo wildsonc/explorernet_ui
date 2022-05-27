@@ -240,7 +240,7 @@ export default function Mapa() {
 
   const roles = accessTokenPayload.roles;
 
-  if (!hasPermission("admin", roles)) {
+  if (!hasPermission("view_support", roles)) {
     return <NotAuthorized />;
   }
 

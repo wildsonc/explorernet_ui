@@ -6,6 +6,7 @@ import {
   Loader,
   Modal,
   MultiSelect,
+  Select,
   useMantineColorScheme,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
@@ -32,6 +33,7 @@ import Tooltip from "../../components/Map/Tooltip";
 import AreaControl from "../../components/marketing/AreaControl";
 import api from "../../services/api";
 import hasPermission from "../../services/utils/hasPermission";
+import { useForm } from "@mantine/form";
 
 interface Category {
   [key: string]: {
@@ -53,6 +55,11 @@ interface ITooltip {
   };
 }
 
+interface IFilter {
+  plans: string[];
+  company?: string;
+}
+
 const color = {
   Online: "green",
   Offline: "red",
@@ -68,10 +75,15 @@ const MapMarketing = () => {
   const [hoverInfo, setHoverInfo] = useState<ITooltip>();
   const [accessPlans, setAccessPlans] = useState<string[]>([]);
   const [selectedPlans, setSelectedPlans] = useState<string[]>([]);
-  const [filter, setFilter] = useState({ plans: [""] });
+  const [filter, setFilter] = useState<IFilter>({ plans: [""] });
   const [coordinate, setCoordinate] = useState("");
   const [openedFilter, setOpenedFilter] = useState(false);
   const mapRef = useRef<MapRef>();
+  const form = useForm({
+    initialValues: {
+      company: "Todas",
+    },
+  });
 
   const { isLoading, isFetching, data, refetch } = useQuery<
     ExtendedFeature[],
@@ -159,8 +171,12 @@ const MapMarketing = () => {
       const filterData = data.features.filter((e: any) => {
         const status = categories[e.properties.status].enabled;
         let access_plan = true;
+        let company = true;
         if (filter.plans && filter.plans[0] != "") {
           access_plan = filter.plans.includes(e.properties.access_plan);
+        }
+        if (form.values.company != "Todas") {
+          company = e.properties.company == filter.company;
         }
         return access_plan && status;
       });
@@ -211,7 +227,7 @@ const MapMarketing = () => {
   useMemo(() => get_categories(), [data]);
 
   const updateFilter = () => {
-    setFilter({ plans: selectedPlans });
+    setFilter({ plans: selectedPlans, company: form.values.company });
     setOpenedFilter(false);
   };
 
@@ -373,6 +389,13 @@ const MapMarketing = () => {
           placeholder="Escolha"
           value={selectedPlans}
           onChange={setSelectedPlans}
+          searchable
+        />
+        <Select
+          data={["Todas", "explorernet", "internetup"]}
+          label="Empresa"
+          placeholder="Escolha"
+          {...form.getInputProps("company")}
           searchable
         />
         <Button fullWidth mt={20} onClick={updateFilter}>
