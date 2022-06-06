@@ -273,7 +273,7 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
                         .fill(templateArgs.bodyArgs)
                         .map((n, i) => (
                           <Select
-                            id={`{{${i + 1}}}`}
+                            key={`{{${i + 1}}}`}
                             label={`{{${i + 1}}}`}
                             data={availableFields}
                             value={body[i]}
