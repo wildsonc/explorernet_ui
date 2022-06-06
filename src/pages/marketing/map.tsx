@@ -1,39 +1,54 @@
 import {
+  ActionIcon,
   Autocomplete,
   Badge,
   Button,
+  Drawer,
   Group,
   Loader,
   Modal,
   MultiSelect,
   Select,
+  Title,
   useMantineColorScheme,
 } from "@mantine/core";
-import { useModals } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import { ExtendedFeature, GeoGeometryObjects } from "d3-geo";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
   CircleLayer,
+  FillLayer,
   FullscreenControl,
   Layer,
+  LineLayer,
   Map,
+  MapLayerMouseEvent,
   MapRef,
   NavigationControl,
   Source,
 } from "react-map-gl";
 import { useQuery } from "react-query";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
-import { Filter, License, Phone, Search, User } from "tabler-icons-react";
+import {
+  Filter,
+  License,
+  Phone,
+  Search,
+  User,
+  History,
+} from "tabler-icons-react";
 import DrawControl from "../../components/Controls/draw-control";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import Legend from "../../components/Map/Legend";
 import Tooltip from "../../components/Map/Tooltip";
-import AreaControl from "../../components/marketing/AreaControl";
+import AreaControl from "../../components/Marketing/AreaControl";
 import api from "../../services/api";
 import hasPermission from "../../services/utils/hasPermission";
 import { useForm } from "@mantine/form";
+import { useClipboard } from "@mantine/hooks";
+import AreaModal from "../../components/Marketing/AreaModal";
+import DrawerContent from "../../components/Marketing/DrawerContent";
 
 interface Category {
   [key: string]: {
@@ -64,6 +79,7 @@ const color = {
   Online: "green",
   Offline: "red",
   Bloqueado: "orange",
+  Reduzido: "orange",
   Cancelado: "gray",
 };
 
@@ -75,20 +91,24 @@ const MapMarketing = () => {
   const [hoverInfo, setHoverInfo] = useState<ITooltip>();
   const [accessPlans, setAccessPlans] = useState<string[]>([]);
   const [selectedPlans, setSelectedPlans] = useState<string[]>([]);
-  const [filter, setFilter] = useState<IFilter>({ plans: [""] });
   const [coordinate, setCoordinate] = useState("");
   const [openedFilter, setOpenedFilter] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const [areaSelected, setAreaSelected] = useState();
+  const [drawerOpened, setDrawerOpened] = useState(false);
   const mapRef = useRef<MapRef>();
+  const clipboard = useClipboard({ timeout: 500 });
+  const [filter, setFilter] = useState<IFilter>({
+    plans: [""],
+    company: "Todas",
+  });
   const form = useForm({
     initialValues: {
       company: "Todas",
     },
   });
 
-  const { isLoading, isFetching, data, refetch } = useQuery<
-    ExtendedFeature[],
-    Error
-  >(
+  const { isLoading, isFetching, data } = useQuery<ExtendedFeature[], Error>(
     "marketing-point-data",
     async () => {
       const response = await api.get(`api/marketing/map`);
@@ -96,6 +116,17 @@ const MapMarketing = () => {
     },
     {
       staleTime: 1000 * 60 * 5, // 5 minutes
+    }
+  );
+
+  const { data: CampaignArea, refetch } = useQuery<ExtendedFeature[], Error>(
+    "marketing-area-data",
+    async () => {
+      const response = await api.get(`api/marketing/campaign?geojson=true`);
+      return response.data;
+    },
+    {
+      staleTime: 1000 * 10, // 1 minute
     }
   );
 
@@ -126,10 +157,31 @@ const MapMarketing = () => {
         color["Offline"],
         "Bloqueado",
         color["Bloqueado"],
+        "Reduzido",
+        color["Reduzido"],
         "Cancelado",
         color["Cancelado"],
         /* other */ "#ccc",
       ],
+    },
+  };
+
+  const fillLayer: FillLayer = {
+    id: "area",
+    type: "fill",
+    paint: {
+      "fill-outline-color": ["get", "color"],
+      "fill-color": ["get", "color"],
+      "fill-opacity": 0.1,
+    },
+  };
+
+  const lineLayer: LineLayer = {
+    id: "outline",
+    type: "line",
+    paint: {
+      "line-width": 1,
+      "line-color": ["get", "color"],
     },
   };
 
@@ -165,6 +217,23 @@ const MapMarketing = () => {
     }
   }, []);
 
+  const onClick = async (event: MapLayerMouseEvent) => {
+    const feature = event?.features;
+    if (feature && feature[0].layer.id == "area") {
+      api
+        .get(`api/marketing/campaign/${feature[0].id}`)
+        .then((response) => setAreaSelected(response.data))
+        .then(() => setOpened(true));
+    } else if (feature && feature[0].layer.id == "point") {
+      clipboard.copy(feature[0].properties?.name);
+      showNotification({
+        message: "Nome copiado!",
+        color: "green",
+      });
+    }
+  };
+
+  //Filter
   const dataMap = useMemo(() => {
     if (categories && data) {
       //@ts-ignore
@@ -172,13 +241,15 @@ const MapMarketing = () => {
         const status = categories[e.properties.status].enabled;
         let access_plan = true;
         let company = true;
-        if (filter.plans && filter.plans[0] != "") {
+
+        if (filter.plans[0] != undefined && filter.plans[0] != "") {
           access_plan = filter.plans.includes(e.properties.access_plan);
         }
+
         if (form.values.company != "Todas") {
-          company = e.properties.company == filter.company;
+          company = e.properties.company == form.values.company;
         }
-        return access_plan && status;
+        return access_plan && status && company;
       });
       return {
         type: "FeatureCollection",
@@ -199,8 +270,11 @@ const MapMarketing = () => {
       ];
       let newCategories: Category = {};
       unique.map((e: string) => {
-        //@ts-ignore
-        newCategories[e] = { enabled: true, color: color[e] };
+        newCategories[e] = {
+          enabled: e != "Reduzido" ? true : false,
+          //@ts-ignore
+          color: color[e],
+        };
         if (categories && categories[e] !== undefined) {
           newCategories[e].enabled = categories[e]
             ? categories[e].enabled
@@ -230,6 +304,12 @@ const MapMarketing = () => {
     setFilter({ plans: selectedPlans, company: form.values.company });
     setOpenedFilter(false);
   };
+  const clearFilter = () => {
+    setSelectedPlans([]);
+    form.reset();
+    setFilter({ plans: [], company: "Todas" });
+    setOpenedFilter(false);
+  };
 
   const Fly = (coordinates: [number, number]) => {
     mapRef.current?.flyTo({
@@ -251,7 +331,8 @@ const MapMarketing = () => {
         ref={mapRef}
         onMouseMove={onHover}
         onMouseLeave={() => setHoverInfo(undefined)}
-        interactiveLayerIds={data ? ["point"] : []}
+        onClick={onClick}
+        interactiveLayerIds={data ? ["point", "area"] : []}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         mapStyle={
           dark
@@ -269,6 +350,17 @@ const MapMarketing = () => {
           zoom: 12,
         }}
       >
+        {CampaignArea && (
+          <Source
+            id="area-data"
+            type="geojson"
+            //  @ts-ignore-next-line
+            data={CampaignArea}
+          >
+            <Layer {...fillLayer} />
+            <Layer {...lineLayer} />
+          </Source>
+        )}
         {data && (
           //  @ts-ignore-next-line
           <Source id="map-data" type="geojson" data={dataMap}>
@@ -377,6 +469,20 @@ const MapMarketing = () => {
             </Group>
           </Tooltip>
         )}
+        <ActionIcon
+          sx={{
+            position: "absolute",
+            bottom: 30,
+            right: 10,
+          }}
+          size="xl"
+          radius="xl"
+          variant="filled"
+          color="blue"
+          onClick={() => setDrawerOpened(true)}
+        >
+          <History />
+        </ActionIcon>
       </Map>
       <Modal
         title={<strong>Filtrar</strong>}
@@ -398,10 +504,32 @@ const MapMarketing = () => {
           {...form.getInputProps("company")}
           searchable
         />
-        <Button fullWidth mt={20} onClick={updateFilter}>
-          Aplicar
-        </Button>
+        <Group mt={20} grow>
+          <Button color="gray" variant="outline" onClick={clearFilter}>
+            Limpar
+          </Button>
+          <Button onClick={updateFilter}>Aplicar</Button>
+        </Group>
       </Modal>
+      {areaSelected && (
+        <AreaModal
+          onClose={setOpened}
+          open={opened}
+          data={areaSelected}
+          refetch={refetch}
+        />
+      )}
+      <Drawer
+        opened={drawerOpened}
+        onClose={() => setDrawerOpened(false)}
+        overlayOpacity={0.4}
+        position="right"
+        title={<Title>Histórico</Title>}
+        padding="xl"
+        size="md"
+      >
+        <DrawerContent mapRef={mapRef.current} />
+      </Drawer>
     </>
   );
 };

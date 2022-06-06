@@ -6,13 +6,15 @@ import {
   Avatar,
   Tooltip,
   Text,
+  ColorInput,
 } from "@mantine/core";
 import api from "../../services/api";
 import moment from "moment";
 import "moment/locale/pt-br";
-import { formatDate } from "../../services/utils/formatDate";
 import { useModals } from "@mantine/modals";
 import { useForm } from "@mantine/form";
+import { useEffect, useState } from "react";
+import { useDebouncedValue } from "@mantine/hooks";
 
 interface Props {
   onClose: (v: boolean) => void;
@@ -25,19 +27,24 @@ moment.locale("pt-br");
 
 export default function AreaModal({ onClose, open, data, refetch }: Props) {
   const modals = useModals();
-  const form = useForm({ initialValues: { time: "1", time_type: "horas" } });
+  const [color, setColor] = useState("");
+  const [debounced] = useDebouncedValue(color, 400);
+
+  useEffect(() => {
+    setColor(data.color);
+  }, [data]);
+
+  useEffect(() => {
+    if (debounced == data.color) return;
+    api
+      .put(`api/marketing/campaign/${data.id}`, { color: debounced })
+      .then((res) => refetch());
+  }, [debounced]);
 
   if (!data) return null;
 
-  const resolve = async (id: number, silence: boolean = false) => {
-    const silenced = silence ? "?silence=true" : "";
-    await api.put(`api/noc/notification/${id}${silenced}`);
-    refetch();
-    onClose(false);
-  };
-
-  const extend = async (id: number) => {
-    await api.put(`api/noc/notification/extend/${id}`, form.values);
+  const remove = async (id: number, silence: boolean = false) => {
+    await api.delete(`api/marketing/campaign/${id}`);
     refetch();
     onClose(false);
   };
@@ -45,24 +52,13 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
   const title = <Title order={3}>{data.title}</Title>;
   const created_at = moment(data.created_at).fromNow();
 
-  const openExtendModal = () =>
+  const openModal = () =>
     modals.openConfirmModal({
-      title: <Title order={3}>Prorrogar</Title>,
+      title: <Title order={3}>Excluir</Title>,
       children: <Text>Você confirma esta ação?</Text>,
       labels: { confirm: "Confirmar", cancel: "Cancelar" },
       confirmProps: { color: "red" },
-      onConfirm: () => extend(data.id),
-      centered: true,
-    });
-
-  const openResolveModal = () =>
-    modals.openConfirmModal({
-      title: <Title order={3}>Normalizar</Title>,
-      children: <Text>Você confirma esta ação?</Text>,
-      labels: { confirm: "Confirmar", cancel: "Resolver em silêncio" },
-      confirmProps: { color: "green" },
-      onConfirm: () => resolve(data.id),
-      onCancel: () => resolve(data.id, true),
+      onConfirm: () => remove(data.id),
       centered: true,
     });
 
@@ -73,14 +69,22 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
       title={title}
       zIndex={1}
     >
-      <Text>{data.description}</Text>
       <Text>
-        <strong>Usuários afetados:</strong>{" "}
-        {data.polygon?.properties?.custumers}
+        <strong>Clientes:</strong> {data.polygon?.properties?.total}
       </Text>
-      <Text py={10} color="dimmed">
-        Previsão: {formatDate(data.expected_date)}
+      <Text>
+        <strong>Template:</strong> {data.template}
       </Text>
+      <Group>
+        <strong>Cor:</strong>
+        <ColorInput
+          mt={5}
+          defaultValue={data.color}
+          value={color}
+          onChange={(e) => setColor(e)}
+        />
+      </Group>
+
       <Group position="apart">
         <Group position="left" sx={{ marginBottom: -5 }}>
           <Tooltip label={data.user.full_name} position="bottom">
@@ -97,11 +101,8 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
           <Text size="sm">{created_at}</Text>
         </Group>
         <Group position="center">
-          <Button variant="outline" color="orange" onClick={openExtendModal}>
-            Prorrogar
-          </Button>
-          <Button variant="filled" color="green" onClick={openResolveModal}>
-            Resolver
+          <Button variant="filled" color="red" onClick={openModal}>
+            Excluir
           </Button>
         </Group>
       </Group>
