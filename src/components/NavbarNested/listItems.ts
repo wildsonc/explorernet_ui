@@ -199,7 +199,7 @@ export const listItems = [
       },
       {
         label: "Rotinas",
-        link: "/admin/routines",
+        link: "/admin/periodics",
         role: "admin",
         description: "Admin → Rotinas",
       },

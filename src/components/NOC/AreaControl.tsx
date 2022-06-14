@@ -10,12 +10,16 @@ import {
   TextInput,
   Checkbox,
   Stack,
+  ActionIcon,
+  Tooltip,
 } from "@mantine/core";
 import { useState, useMemo, useEffect } from "react";
 import { useForm } from "@mantine/form";
 import { ExtendedFeature, geoContains } from "d3-geo";
-import { NewSection } from "tabler-icons-react";
+import { Download, NewSection } from "tabler-icons-react";
 import api from "../../services/api";
+import FileSaver from "file-saver";
+import json2csv from "json2csv";
 
 export default function AreaControl({ polygon, dataMap, refetch }: any) {
   const [selectedPoints, setSelectedPoints] = useState<ExtendedFeature[]>([]);
@@ -68,6 +72,17 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
+  const handleExport = () => {
+    const csv = json2csv.parse(form.values.custumers, {
+      fields: ["username"],
+      quote: "",
+    });
+    const blob = new Blob([csv], {
+      type: "text/plain;charset=utf-8",
+    });
+    FileSaver.saveAs(blob, "custumers.txt");
+  };
+
   return (
     <>
       {polygon && selectedPoints?.length && (
@@ -86,10 +101,22 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
             zIndex: 10,
           }}
         >
-          <span>
+          <Group>
             {" "}
-            <strong>Selecionados:</strong> {selectedPoints.length}
-          </span>
+            <span>
+              <strong>Selecionados:</strong> {selectedPoints.length}
+            </span>
+            <Tooltip label="Download" position="right" withArrow>
+              <ActionIcon
+                variant="hover"
+                color="blue"
+                mx={-5}
+                onClick={handleExport}
+              >
+                <Download size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
           <Button onClick={() => setOpened(true)} leftIcon={<NewSection />}>
             Nova área
           </Button>
@@ -198,7 +225,6 @@ function insidePolygon(polygon: any, dataRaw: any) {
     });
     newData = newData.map((e: any) => e.properties);
     const custumers = newData.map((e: any) => e.username);
-    console.log(custumers);
     return newData;
   }
 

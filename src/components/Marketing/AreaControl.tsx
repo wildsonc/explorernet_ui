@@ -16,13 +16,16 @@ import {
   ActionIcon,
   Select,
   Box,
+  Tooltip,
 } from "@mantine/core";
 import { useState, useMemo, useEffect } from "react";
 import { useForm } from "@mantine/form";
 import { ExtendedFeature, geoContains } from "d3-geo";
-import { NewSection, Paint, Refresh } from "tabler-icons-react";
+import { Download, NewSection, Paint, Refresh } from "tabler-icons-react";
 import api from "../../services/api";
 import TemplateCard from "../TemplateCard";
+import FileSaver from "file-saver";
+import json2csv from "json2csv";
 
 interface DatabaseProps {
   id: number;
@@ -66,7 +69,6 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
       template: "",
       custumers: selectedPoints,
       header: "",
-      body: [],
       polygon: polygon,
     },
   });
@@ -86,14 +88,19 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
   }, [form.values.company]);
 
   const handleSubmit = async (values: FormValues) => {
-    await api.post("api/marketing/campaign", {
+    let data: any = {
       ...values,
-      body,
       polygon: {
         ...values.polygon[0],
         properties: { color: values.color, total: values.custumers.length },
       },
-    });
+      query: { body },
+    };
+    if (templateArgs?.hasImage) data.query.image = values.header;
+    if (templateArgs?.hasVideo) data.query.video = values.header;
+    if (templateArgs?.hasDocument) data.query.document = values.header;
+    if (templateArgs?.hasDocument) data.query.filename = "arquivo";
+    await api.post("api/marketing/campaign", data);
     reset();
   };
 
@@ -123,6 +130,17 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
+  const handleExport = () => {
+    const csv = json2csv.parse(form.values.custumers, {
+      fields: ["phone", "name", "company", "access_plan"],
+      quote: "",
+    });
+    const blob = new Blob([csv], {
+      type: "text/plain;charset=utf-8",
+    });
+    FileSaver.saveAs(blob, "custumers.txt");
+  };
+
   const templateSelected = template?.filter(
     (e) => e.name == form.values.template
   )[0];
@@ -149,12 +167,24 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
             zIndex: 10,
           }}
         >
-          <Text>
-            <Text component="span" weight={700}>
-              Selecionados:
-            </Text>{" "}
-            {selectedPoints.length}
-          </Text>
+          <Group align="center">
+            <Text>
+              <Text component="span" weight={700}>
+                Selecionados:
+              </Text>{" "}
+              {selectedPoints.length}
+            </Text>
+            <Tooltip label="Download" position="right" withArrow>
+              <ActionIcon
+                variant="hover"
+                color="blue"
+                mx={-5}
+                onClick={handleExport}
+              >
+                <Download size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
           <Button onClick={() => setOpened(true)} leftIcon={<NewSection />}>
             Nova campanha
           </Button>

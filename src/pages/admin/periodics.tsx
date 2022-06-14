@@ -42,19 +42,14 @@ interface Props {
   last_run_at?: string;
   total_run_count?: number;
   one_off: boolean;
-  template: string;
   task: string;
-  query: string;
-  unique: boolean;
   start_time?: string;
 }
 
 const initialValues = {
   name: "",
   task: "",
-  query: "",
   one_off: false,
-  unique: false,
   enabled: true,
   minute: "*",
   hour: "*",
@@ -64,7 +59,7 @@ const initialValues = {
   start_time: "",
 };
 
-function Database() {
+function Routines() {
   const { accessTokenPayload } = useSessionContext();
   const addForm = useForm({ initialValues });
   const editForm = useForm({
@@ -74,12 +69,11 @@ function Database() {
   const [opened, setOpened] = useState(false);
   const [openedEdit, setOpenedEdit] = useState(false);
   const [tasks, setTasks] = useState<string[]>([]);
-  const [queries, setQueries] = useState<string[]>([]);
 
   const { data, refetch } = useQuery<Props[], Error>(
-    "periodic",
+    "admin-periodic",
     async () => {
-      const response = await api.get(`api/whatsapp/periodic`);
+      const response = await api.get(`api/periodic`);
       return response.data.sort((a: Props, b: Props) =>
         a.name > b.name ? 1 : b.name > a.name ? -1 : 0
       );
@@ -90,13 +84,7 @@ function Database() {
   );
 
   useEffect(() => {
-    api.get("api/whatsapp/tasks").then((res) => setTasks(res.data));
-  }, []);
-
-  useEffect(() => {
-    api
-      .get("api/whatsapp/query")
-      .then((res) => setQueries(res.data.map((e: any) => e.name)));
+    api.get("api/tasks").then((res) => setTasks(res.data));
   }, []);
 
   const roles = accessTokenPayload.roles;
@@ -132,10 +120,11 @@ function Database() {
       labels: { confirm: "Deletar", cancel: "Cancelar" },
       confirmProps: { color: "red" },
       onCancel: () => console.log("Cancel"),
-      onConfirm: () => deleteDatabase(e),
+      onConfirm: () => deletePeriodic(e),
     });
-  const deleteDatabase = async (e: Props) => {
-    await api.delete(`api/whatsapp/periodic/${e.id}`);
+
+  const deletePeriodic = async (e: Props) => {
+    await api.delete(`api/periodic/${e.id}`);
     showNotification({
       title: "Deletado",
       message: e.name,
@@ -145,14 +134,14 @@ function Database() {
   };
 
   const handleSubmit = async (values: typeof addForm.values) => {
-    await api.post(`api/whatsapp/periodic`, values);
+    await api.post(`api/periodic`, values);
     refetch();
     setOpened(false);
     addForm.reset();
   };
 
   const handleEditSubmit = async (values: typeof editForm.values) => {
-    await api.put(`api/whatsapp/periodic/${values.id}`, values);
+    await api.put(`api/periodic/${values.id}`, values);
     refetch();
     setOpenedEdit(false);
     editForm.reset();
@@ -166,12 +155,6 @@ function Database() {
         data={tasks}
         required
         {...addForm.getInputProps("task")}
-      />
-      <Select
-        label="Query"
-        required
-        data={queries}
-        {...addForm.getInputProps("query")}
       />
       <Group position="apart" grow sx={{ textAlign: "center" }}>
         <TextInput
@@ -212,11 +195,6 @@ function Database() {
         ></Input>
       </InputWrapper>
       <Checkbox
-        label="Único"
-        mt={20}
-        {...addForm.getInputProps("unique", { type: "checkbox" })}
-      />
-      <Checkbox
         label="One-Off"
         mt={20}
         {...addForm.getInputProps("one_off", { type: "checkbox" })}
@@ -241,12 +219,6 @@ function Database() {
         data={tasks}
         required
         {...editForm.getInputProps("task")}
-      />
-      <Select
-        label="Query"
-        required
-        data={queries}
-        {...editForm.getInputProps("query")}
       />
       <Group position="apart" grow sx={{ textAlign: "center" }}>
         <TextInput
@@ -287,11 +259,6 @@ function Database() {
         ></Input>
       </InputWrapper>
       <Checkbox
-        label="Único"
-        mt={20}
-        {...editForm.getInputProps("unique", { type: "checkbox" })}
-      />
-      <Checkbox
         label="One-Off"
         mt={20}
         {...editForm.getInputProps("one_off", { type: "checkbox" })}
@@ -310,12 +277,15 @@ function Database() {
   );
 
   const getCrontab = (i: Crontab) => {
-    return `${i.minute} ${i.hour} ${i.day_of_week} ${i.day_of_month} ${i.month_of_year}`;
+    return `${i.minute} 
+                ${i.hour} 
+                ${i.day_of_week} 
+                ${i.day_of_month} 
+                ${i.month_of_year}`;
   };
 
   const getNextRun = (crontab: Crontab) => {
-    const c = getCrontab(crontab).split(" ");
-    const interval = parseExpression(`${c[0]} ${c[1]} ${c[3]} ${c[4]} ${c[2]}`);
+    const interval = parseExpression(getCrontab(crontab));
     return interval.next().toString();
   };
 
@@ -348,22 +318,6 @@ function Database() {
       </td>
 
       <td>
-        <Text
-          size="sm"
-          weight={500}
-          sx={{ textOverflow: "ellipsis", maxWidth: 140, overflow: "hidden" }}
-        >
-          {item.template}
-        </Text>
-      </td>
-      <td>
-        {item.unique ? (
-          <Badge color="green">SIM</Badge>
-        ) : (
-          <Badge color="red">NÃO</Badge>
-        )}
-      </td>
-      <td>
         {item.one_off ? (
           <Badge color="green">SIM</Badge>
         ) : (
@@ -371,17 +325,17 @@ function Database() {
         )}
       </td>
       <td>
-        <Text size="sm" weight={500} align="center">
+        <Text size="sm" weight={500}>
           {item.last_run_at && formatDate(item.last_run_at)}
         </Text>
       </td>
       <td>
-        <Text size="sm" weight={500} align="center">
+        <Text size="sm" weight={500}>
           {formatDate(getNextRun(item.crontab))}
         </Text>
       </td>
       <td>
-        <Group spacing={0} position="left" noWrap>
+        <Group spacing={0} position="left">
           <ActionIcon
             onClick={() => {
               //@ts-ignore
@@ -389,8 +343,6 @@ function Database() {
                 id: item.id,
                 name: item.name,
                 task: item.task,
-                query: item.query,
-                unique: item.unique,
                 one_off: item.one_off,
                 enabled: item.enabled,
                 start_time: item.start_time ? item.start_time : "",
@@ -414,11 +366,9 @@ function Database() {
         <Table sx={{ minWidth: 800 }} verticalSpacing="xs" highlightOnHover>
           <thead>
             <tr>
-              <th>Status</th>
+              <th></th>
               <th>Nome</th>
               <th>Crontab</th>
-              <th>Template</th>
-              <th>Único</th>
               <th>One-Off</th>
               <th>Última execução</th>
               <th>Próxima execução</th>
@@ -456,4 +406,4 @@ function Database() {
   );
 }
 
-export default Database;
+export default Routines;
