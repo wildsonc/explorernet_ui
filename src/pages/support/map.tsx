@@ -67,6 +67,7 @@ interface ICategory {
 const color = {
   Online: "blue",
   Offline: "red",
+  Reduzido: "Orange",
 };
 
 export default function Mapa() {
@@ -87,7 +88,7 @@ export default function Mapa() {
   >(
     "point-data",
     async () => {
-      const response = await api.get(`api/noc/map`);
+      const response = await api.get(`api/support/map`);
       return response.data;
     },
     {
@@ -155,6 +156,8 @@ export default function Mapa() {
         color["Online"],
         "Offline",
         color["Offline"],
+        "Reduzido",
+        color["Reduzido"],
         /* other */ "#ccc",
       ],
     },

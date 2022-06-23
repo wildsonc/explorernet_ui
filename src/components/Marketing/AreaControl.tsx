@@ -67,7 +67,7 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
       color: "",
       company: "",
       template: "",
-      custumers: selectedPoints,
+      customers: selectedPoints,
       header: "",
       polygon: polygon,
     },
@@ -92,7 +92,7 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
       ...values,
       polygon: {
         ...values.polygon[0],
-        properties: { color: values.color, total: values.custumers.length },
+        properties: { color: values.color, total: values.customers.length },
       },
       query: { body },
     };
@@ -119,7 +119,7 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
   }, [dataMap, polygon]);
 
   useEffect(() => {
-    form.setFieldValue("custumers", selectedPoints);
+    form.setFieldValue("customers", selectedPoints);
     if (polygon) {
       form.setFieldValue("polygon", Object.values(polygon));
     }
@@ -131,14 +131,14 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
     setActive((current) => (current > 0 ? current - 1 : current));
 
   const handleExport = () => {
-    const csv = json2csv.parse(form.values.custumers, {
+    const csv = json2csv.parse(form.values.customers, {
       fields: ["phone", "name", "company", "access_plan"],
       quote: "",
     });
     const blob = new Blob([csv], {
       type: "text/plain;charset=utf-8",
     });
-    FileSaver.saveAs(blob, "custumers.txt");
+    FileSaver.saveAs(blob, "customers.txt");
   };
 
   const templateSelected = template?.filter(

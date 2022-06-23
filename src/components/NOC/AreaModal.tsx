@@ -10,7 +10,6 @@ import {
 import api from "../../services/api";
 import moment from "moment";
 import "moment/locale/pt-br";
-import { formatDate } from "../../services/utils/formatDate";
 import { useModals } from "@mantine/modals";
 import { useForm } from "@mantine/form";
 
@@ -66,6 +65,18 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
       centered: true,
     });
 
+  const formatDate = (date: string) => {
+    let newDate = new Date(date).toLocaleString("pt-BR", {
+      hour12: false,
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return newDate;
+  };
+
   return (
     <Modal
       opened={open}
@@ -76,7 +87,7 @@ export default function AreaModal({ onClose, open, data, refetch }: Props) {
       <Text>{data.description}</Text>
       <Text>
         <strong>Usuários afetados:</strong>{" "}
-        {data.polygon?.properties?.custumers}
+        {data.polygon?.properties?.customers}
       </Text>
       <Text py={10} color="dimmed">
         Previsão: {formatDate(data.expected_date)}

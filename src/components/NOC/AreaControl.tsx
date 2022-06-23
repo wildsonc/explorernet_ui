@@ -34,7 +34,7 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
       telegram: false,
       whatsapp: true,
       sms: false,
-      custumers: selectedPoints,
+      customers: selectedPoints,
       polygon: polygon,
     },
   });
@@ -44,7 +44,7 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
     setLoading(true);
     let data = { ...values, polygon: values.polygon[0] };
     data.polygon.properties = {
-      custumers: values.custumers.length,
+      customers: values.customers.length,
     };
     await api.post("api/noc/notification", data);
     refetch();
@@ -61,7 +61,7 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
   }, [dataMap, polygon]);
 
   useEffect(() => {
-    form.setFieldValue("custumers", selectedPoints);
+    form.setFieldValue("customers", selectedPoints);
     if (polygon) {
       form.setFieldValue("polygon", Object.values(polygon));
     }
@@ -73,14 +73,14 @@ export default function AreaControl({ polygon, dataMap, refetch }: any) {
     setActive((current) => (current > 0 ? current - 1 : current));
 
   const handleExport = () => {
-    const csv = json2csv.parse(form.values.custumers, {
+    const csv = json2csv.parse(form.values.customers, {
       fields: ["username"],
       quote: "",
     });
     const blob = new Blob([csv], {
       type: "text/plain;charset=utf-8",
     });
-    FileSaver.saveAs(blob, "custumers.txt");
+    FileSaver.saveAs(blob, "customers.txt");
   };
 
   return (
@@ -224,7 +224,7 @@ function insidePolygon(polygon: any, dataRaw: any) {
       }
     });
     newData = newData.map((e: any) => e.properties);
-    const custumers = newData.map((e: any) => e.username);
+    const customers = newData.map((e: any) => e.username);
     return newData;
   }
 
