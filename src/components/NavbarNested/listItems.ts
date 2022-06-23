@@ -41,6 +41,14 @@ export const listItems = [
         description: "Financeiro → Mudança de plano",
       },
       {
+        label: "Mudança de plano",
+        badge: "beta",
+        badgeColor: "orange",
+        link: "/finance/access_plan_unico",
+        role: "admin",
+        description: "Financeiro → Mudança de plano (UNICO)",
+      },
+      {
         label: "Mudança de endereço",
         link: "/finance/address",
         role: "view_finance",
@@ -54,25 +62,25 @@ export const listItems = [
       },
     ],
   },
-  {
-    label: "Retenção",
-    icon: UserCheck,
-    role: "view_retention",
-    links: [
-      {
-        label: "Cancelamento",
-        link: "/retention/cancel",
-        role: "view_retention",
-        description: "Retenção → Cancelamento",
-      },
-      {
-        label: "Configurações",
-        link: "/retention/settings",
-        role: "admin",
-        description: "Retenção → Configurações",
-      },
-    ],
-  },
+  // {
+  //   label: "Retenção",
+  //   icon: UserCheck,
+  //   role: "view_retention",
+  //   links: [
+  //     {
+  //       label: "Cancelamento",
+  //       link: "/retention/cancel",
+  //       role: "view_retention",
+  //       description: "Retenção → Cancelamento",
+  //     },
+  //     {
+  //       label: "Configurações",
+  //       link: "/retention/settings",
+  //       role: "admin",
+  //       description: "Retenção → Configurações",
+  //     },
+  //   ],
+  // },
   {
     label: "Marketing",
     icon: Ad2,

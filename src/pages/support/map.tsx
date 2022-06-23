@@ -64,6 +64,11 @@ interface ICategory {
   };
 }
 
+const color = {
+  Online: "blue",
+  Offline: "red",
+};
+
 export default function Mapa() {
   const { colorScheme } = useMantineColorScheme();
   const [drawerOpened, setDrawerOpened] = useState(false);
@@ -139,16 +144,17 @@ export default function Mapa() {
           [5, 0.5],
           [9, 0.8],
           [12, 1.3],
-          [22, 180],
+          [22, 60],
+          [30, 80],
         ],
       },
       "circle-color": [
         "match",
         ["get", "status"],
         "Online",
-        "blue",
+        color["Online"],
         "Offline",
-        "red",
+        color["Offline"],
         /* other */ "#ccc",
       ],
     },
@@ -198,7 +204,8 @@ export default function Mapa() {
       ];
       let newCategories: ICategory = {};
       unique.map((e: string) => {
-        newCategories[e] = { enabled: true };
+        //@ts-ignore
+        newCategories[e] = { enabled: true, color: color[e] };
         if (categories && categories[e] !== undefined) {
           newCategories[e].enabled = categories[e]
             ? categories[e].enabled

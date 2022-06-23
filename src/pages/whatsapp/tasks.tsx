@@ -1,7 +1,9 @@
 import {
   ActionIcon,
   Badge,
+  Box,
   Button,
+  Center,
   Checkbox,
   Group,
   Input,
@@ -328,56 +330,65 @@ function Database() {
   const rows = data.map((item) => (
     <tr key={item.id}>
       <td>
-        <Badge
-          color={item.enabled ? "green" : "red"}
-          sx={{ "&:hover": { cursor: "pointer" } }}
-          onClick={() => toggleState(item.id, !item.enabled)}
-        >
-          {item.enabled ? "ATIVO" : "INATIVO"}
-        </Badge>
+        <Center>
+          <Badge
+            color={item.enabled ? "green" : "red"}
+            sx={{ "&:hover": { cursor: "pointer" } }}
+            onClick={() => toggleState(item.id, !item.enabled)}
+          >
+            {item.enabled ? "ATIVO" : "INATIVO"}
+          </Badge>
+        </Center>
       </td>
       <td>
-        <Text size="sm" weight={500}>
+        <Text size="sm" weight={500} align="center">
           {item.name}
         </Text>
       </td>
       <td>
-        <Text size="sm" weight={500}>
+        <Text size="sm" weight={500} align="center">
           {getCrontab(item.crontab)}
         </Text>
       </td>
 
       <td>
-        <Text
-          size="sm"
-          weight={500}
-          sx={{ textOverflow: "ellipsis", maxWidth: 140, overflow: "hidden" }}
-        >
-          {item.template}
-        </Text>
+        <Center>
+          <Text
+            size="sm"
+            weight={500}
+            align="center"
+            sx={{ textOverflow: "ellipsis", maxWidth: 140, overflow: "hidden" }}
+          >
+            {item.template}
+          </Text>
+        </Center>
       </td>
       <td>
-        {item.unique ? (
-          <Badge color="green">SIM</Badge>
-        ) : (
-          <Badge color="red">NÃO</Badge>
-        )}
+        <Center>
+          {item.unique ? (
+            <Badge color="green">SIM</Badge>
+          ) : (
+            <Badge color="red">NÃO</Badge>
+          )}
+        </Center>
       </td>
       <td>
-        {item.one_off ? (
-          <Badge color="green">SIM</Badge>
-        ) : (
-          <Badge color="red">NÃO</Badge>
-        )}
+        <Center>
+          {item.one_off ? (
+            <Badge color="green">SIM</Badge>
+          ) : (
+            <Badge color="red">NÃO</Badge>
+          )}
+        </Center>
       </td>
       <td>
         <Text size="sm" weight={500} align="center">
-          {item.last_run_at && formatDate(item.last_run_at)}
+          {item.last_run_at ? formatDate(item.last_run_at) : "-"}
         </Text>
       </td>
       <td>
         <Text size="sm" weight={500} align="center">
-          {formatDate(getNextRun(item.crontab))}
+          {item.enabled ? formatDate(getNextRun(item.crontab)) : "-"}
         </Text>
       </td>
       <td>
@@ -414,14 +425,30 @@ function Database() {
         <Table sx={{ minWidth: 800 }} verticalSpacing="xs" highlightOnHover>
           <thead>
             <tr>
-              <th>Status</th>
-              <th>Nome</th>
-              <th>Crontab</th>
-              <th>Template</th>
-              <th>Único</th>
-              <th>One-Off</th>
-              <th>Última execução</th>
-              <th>Próxima execução</th>
+              <th>
+                <Text align="center">Status</Text>
+              </th>
+              <th>
+                <Text align="center">Nome</Text>
+              </th>
+              <th>
+                <Text align="center">Crontab</Text>
+              </th>
+              <th>
+                <Text align="center">Template</Text>
+              </th>
+              <th>
+                <Text align="center">Único</Text>
+              </th>
+              <th>
+                <Text align="center">One-Off</Text>
+              </th>
+              <th>
+                <Text align="center">Última execução</Text>
+              </th>
+              <th>
+                <Text align="center">Próxima execução</Text>
+              </th>
               <th />
             </tr>
           </thead>

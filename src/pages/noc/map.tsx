@@ -175,7 +175,8 @@ export default function Mapa() {
           [5, 0.5],
           [9, 0.8],
           [12, 1.3],
-          [22, 180],
+          [22, 60],
+          [30, 80],
         ],
       },
       "circle-color": [

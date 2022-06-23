@@ -9,17 +9,24 @@ import {
   useMantineTheme,
   Anchor,
   Text,
+  Badge,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
-import { ArrowRight, Businessplan } from "tabler-icons-react";
+import {
+  ArrowRight,
+  Businessplan,
+  Settings,
+  SettingsAutomation,
+} from "tabler-icons-react";
 import CustumerPainel from "../../components/CustomerPainel";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
 import hasPermission from "../../services/utils/hasPermission";
 import { useModals } from "@mantine/modals";
+import AutoSaveTextInput from "../../components/AutoSave/AutoSaveTextInput";
 
 interface AccessPlan {
   name: string;
@@ -67,7 +74,7 @@ const ChangePlan = () => {
   const modals = useModals();
   const searchForm = useForm({
     initialValues: {
-      type: "codconexao",
+      type: "contrato",
       value: "",
     },
   });
@@ -91,10 +98,27 @@ const ChangePlan = () => {
     return <NotAuthorized />;
   }
 
+  const openSettingsModal = () =>
+    modals.openModal({
+      title: (
+        <>
+          <Text weight={600}>
+            <Settings size={16} /> Configurações
+          </Text>
+        </>
+      ),
+      children: (
+        <>
+          <AutoSaveTextInput label="PDF Template" name="APITEMPLATE_MDP" />
+          <AutoSaveTextInput label="UNICO Template" name="UNICO_MDP" />
+        </>
+      ),
+    });
+
   const handleSubmit = async (values: typeof form.values) => {
     setIsLoadingDocument(true);
     const payload = { ...data?.customer, ...values };
-    const res = await api.post("api/finance/generate_document_mdp", payload);
+    const res = await api.post("api/finance/mdp_unico", payload);
     const openContentModal = () => {
       const id = modals.openModal({
         title: <strong>Documento criado</strong>,
@@ -154,8 +178,8 @@ const ChangePlan = () => {
             mr={-15}
             {...searchForm.getInputProps("type")}
             data={[
-              { label: "contrato", value: "contrato" },
               { label: "conexão", value: "codconexao" },
+              { label: "contrato", value: "contrato" },
             ]}
             styles={{
               input: {
@@ -198,7 +222,7 @@ const ChangePlan = () => {
       </form>
       <CustumerPainel {...data} />
       <Title mt={20} order={2}>
-        Novo plano
+        Alterar plano
       </Title>
       {data?.access_plans && (
         <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -238,6 +262,16 @@ const ChangePlan = () => {
             {isLoadingDocument ? "Gerando" : "Gerar contrato"}
           </Button>
         </form>
+      )}
+      {hasPermission("admin", roles) && (
+        <ActionIcon
+          sx={{ position: "absolute", bottom: 30, right: 30 }}
+          size="xl"
+          color="blue"
+          onClick={openSettingsModal}
+        >
+          <Settings />
+        </ActionIcon>
       )}
     </>
   );

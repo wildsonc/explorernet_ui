@@ -21,7 +21,7 @@ import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { ArrowRight, FileInvoice, Lock, LockOpen } from "tabler-icons-react";
-import CustumerPainel from "../../components/CustumerPainel";
+import CustomerPainel from "../../components/CustomerPainel";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
 import { formatDate } from "../../services/utils/formatDate";
@@ -47,10 +47,10 @@ interface Invoice {
   overdue: boolean;
 }
 
-interface Custumer {
+interface Customer {
   contract: number;
   connection: number;
-  custumer?: number;
+  customer?: number;
   full_name: string;
   document: string;
   city: string;
@@ -72,7 +72,7 @@ interface Custumer {
 }
 
 interface Props {
-  custumer?: Custumer;
+  customer?: Customer;
   history: History[];
   invoices: Invoice[];
   used_days: number;
@@ -112,7 +112,7 @@ const Negotiation = () => {
   });
 
   useEffect(() => {
-    if (!data?.custumer) return;
+    if (!data?.customer) return;
     let total = 0;
     let newInterest = 0;
     data.invoices.forEach((e) => {
@@ -162,7 +162,7 @@ const Negotiation = () => {
   const handleSubmitSearch = async (values: typeof searchForm.values) => {
     setIsLoading(true);
     setSelection([]);
-    const response = await api.post<Props>("api/finance/custumer", {
+    const response = await api.post<Props>("api/finance/customer", {
       ...values,
       method: "negotiation",
     });
@@ -283,8 +283,8 @@ const Negotiation = () => {
       <Grid>
         <Grid.Col sm={9}>
           <ScrollArea sx={{ height: 680 }}>
-            <CustumerPainel {...data} />
-            {data?.custumer && (
+            <CustomerPainel {...data} />
+            {data?.customer && (
               <>
                 <Title order={4} mt={10}>
                   Faturas
