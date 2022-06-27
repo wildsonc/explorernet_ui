@@ -21,6 +21,7 @@ import hasPermission from "../../services/utils/hasPermission";
 import ZapSignIcon from "../../components/Icons/ZapSignIcon";
 import TemplateIcon from "../../components/Icons/ApiTemplateIcon";
 import UnicoIcon from "../../components/Icons/UnicoIcon";
+import SpcIcon from "../../components/Icons/SpcIcon";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -80,7 +81,7 @@ export default function ActionsGrid() {
       color: "violet",
       children: (
         <>
-          <AutoSaveTextInput label="Site URL" name="METABASE_SITE_URL" />
+          <AutoSaveTextInput label="URL" name="METABASE_SITE_URL" />
           <AutoSaveTextInput label="Secret Key" name="METABASE_SECRET_KEY" />
         </>
       ),
@@ -148,13 +149,13 @@ export default function ActionsGrid() {
       ),
     },
     {
-      title: "Whatsapp",
-      icon: BrandWhatsapp,
+      title: "SPC Brasil",
+      icon: SpcIcon,
+      mt: -10,
       color: "green",
       children: (
         <>
-          <AutoSaveTextInput label="API KEY" name="WHATSAPP_API_KEY" />
-          <AutoSaveTextInput label="Namespace" name="WHATSAPP_NAMESPACE" />
+          <AutoSaveTextInput label="Token" name="SPC_TOKEN" />
         </>
       ),
     },
@@ -232,10 +233,10 @@ export default function ActionsGrid() {
       className={classes.item}
       onClick={() => openModal(item.title, item.children)}
     >
-      <item.icon color={theme.colors[item.color][6]} size={32} />
-      <Text size="xs" mt={7}>
-        {item.title}
-      </Text>
+      <Group direction="column" align="center">
+        <item.icon color={theme.colors[item.color][6]} size={32} />
+        <Text size="xs">{item.title}</Text>
+      </Group>
     </UnstyledButton>
   ));
 

@@ -17,13 +17,18 @@ import { ActionLink, LinksGroup } from "../NavbarLinksGroup";
 import { UserButton } from "../UserButton";
 import { useStyles } from "./styles";
 import { listItems } from "./listItems";
+import { useViewportSize } from "@mantine/hooks";
 
-export function NavbarNested() {
+interface Props {
+  opened: boolean;
+}
+
+export function NavbarNested({ opened }: Props) {
   let { accessTokenPayload } = useSessionContext();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const { classes } = useStyles();
   const router = useRouter();
-  const [opened, setOpened] = useState(false);
+  const { height, width } = useViewportSize();
 
   useEffect(() => {
     api.post("api/auth/update/roles").then((res) => {
@@ -66,32 +71,33 @@ export function NavbarNested() {
       nothingFoundMessage="Nada encontrado..."
     >
       <Navbar
-        height={"100vh"}
-        width={{ base: 250 }}
+        width={{ sm: 200, lg: 250 }}
         hiddenBreakpoint="sm"
         hidden={!opened}
         p="md"
         className={classes.navbar}
       >
-        <Navbar.Section className={classes.header}>
-          <Group position="apart">
-            {dark ? <LogoDark width={80} /> : <Logo width={80} />}
-            <ActionIcon
-              size="lg"
-              sx={(theme) => ({
-                backgroundColor: dark
-                  ? theme.colors.dark[6]
-                  : theme.colors.gray[0],
-                color: dark ? theme.colors.yellow[4] : theme.colors.blue[6],
-              })}
-              color={dark ? "yellow" : "blue"}
-              onClick={() => toggleColorScheme()}
-              title="Alterar tema"
-            >
-              {dark ? <Sun size={18} /> : <MoonStars size={18} />}
-            </ActionIcon>
-          </Group>
-        </Navbar.Section>
+        {width > 768 && (
+          <Navbar.Section className={classes.header}>
+            <Group position="apart">
+              {dark ? <LogoDark width={80} /> : <Logo width={80} />}
+              <ActionIcon
+                size="lg"
+                sx={(theme) => ({
+                  backgroundColor: dark
+                    ? theme.colors.dark[6]
+                    : theme.colors.gray[0],
+                  color: dark ? theme.colors.yellow[4] : theme.colors.blue[6],
+                })}
+                color={dark ? "yellow" : "blue"}
+                onClick={() => toggleColorScheme()}
+                title="Alterar tema"
+              >
+                {dark ? <Sun size={18} /> : <MoonStars size={18} />}
+              </ActionIcon>
+            </Group>
+          </Navbar.Section>
+        )}
 
         <Navbar.Section grow className={classes.links} component={ScrollArea}>
           <div className={classes.linksInner}>

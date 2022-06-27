@@ -8,13 +8,7 @@ const SvgComponent = (
     xmlSpace="preserve"
     width={50}
     height={50}
-    style={{
-      shapeRendering: "geometricPrecision",
-      textRendering: "geometricPrecision",
-      fillRule: "evenodd",
-      clipRule: "evenodd",
-    }}
-    viewBox="0 0 4791.76 1858.11"
+    viewBox="0 -1000 4791.76 1858.11"
     {...props}
   >
     <defs>

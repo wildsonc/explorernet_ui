@@ -7,6 +7,7 @@ import {
   Coin,
   UserCheck,
   Ad2,
+  BuildingStore,
 } from "tabler-icons-react";
 
 export const listItems = [
@@ -41,7 +42,7 @@ export const listItems = [
         description: "Financeiro → Mudança de plano",
       },
       {
-        label: "Mudança de plano",
+        label: "Mudança de plano ",
         badge: "beta",
         badgeColor: "orange",
         link: "/finance/access_plan_unico",
@@ -101,6 +102,31 @@ export const listItems = [
     ],
   },
   {
+    label: "Comercial",
+    icon: BuildingStore,
+    role: "view_sales",
+    links: [
+      {
+        label: "Flow",
+        link: "/sales/flow",
+        role: "admin",
+        description: "Comercial → Flow",
+      },
+      {
+        label: "Vendedores",
+        link: "/sales/sellers",
+        role: "admin",
+        description: "Comercial → Vendedores",
+      },
+      {
+        label: "Configuração",
+        link: "/sales/settings",
+        role: "admin",
+        description: "Comercial → Configuração",
+      },
+    ],
+  },
+  {
     label: "Nível 2",
     icon: Circle2,
     role: "view_support2",
@@ -129,12 +155,6 @@ export const listItems = [
         link: "/noc/map",
         role: "view_noc",
         description: "NOC → Mapa",
-      },
-      {
-        label: "Screenshot",
-        link: "/noc/bot-screenshot",
-        role: "admin",
-        description: "NOC → Bot screenshot",
       },
       {
         label: "Configurações",

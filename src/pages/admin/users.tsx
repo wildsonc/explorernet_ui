@@ -4,6 +4,7 @@ import {
   Avatar,
   Badge,
   Button,
+  Center,
   createStyles,
   Group,
   Modal,
@@ -14,6 +15,7 @@ import {
   Tooltip,
   TransferList,
   useMantineTheme,
+  Loader,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";
@@ -115,7 +117,13 @@ export default function UsersTable() {
     }
   );
 
-  if (!data) return <></>;
+  if (!data) {
+    return (
+      <Center>
+        <Loader />
+      </Center>
+    );
+  }
   if (!sortedData) return <></>;
   if (!groups) return <></>;
 

@@ -17,6 +17,7 @@ import {
 import { useStyles } from "./styles";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import hasPermission from "../../services/utils/hasPermission";
+import { useRouter } from "next/router";
 
 interface LinksGroupProps {
   icon: TablerIcon;
@@ -41,6 +42,7 @@ export function LinksGroup({
   const { classes, theme } = useStyles();
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
+  const router = useRouter();
 
   const ChevronIcon = theme.dir === "ltr" ? ChevronRight : ChevronLeft;
 
@@ -50,7 +52,12 @@ export function LinksGroup({
     if (hasPermission(link.role, roles)) {
       return (
         <Link href={link.link} passHref key={link.label}>
-          <Text<"a"> component="a" className={classes.link}>
+          <Text<"a">
+            component="a"
+            className={
+              router.pathname == link.link ? classes.current : classes.link
+            }
+          >
             {link.label}
             {link.badge ? (
               <Badge ml={2} p={3} size="xs" color={link.badgeColor}>
