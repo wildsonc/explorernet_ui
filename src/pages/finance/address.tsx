@@ -14,7 +14,7 @@ import { showNotification } from "@mantine/notifications";
 import { useState } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { ArrowRight } from "tabler-icons-react";
-import CustumerPainel from "../../components/CustomerPainel";
+import CustomerPainel from "../../components/CustomerPainel";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
 import hasPermission from "../../services/utils/hasPermission";
@@ -25,7 +25,7 @@ interface AccessPlan {
   value: number;
 }
 
-interface Custumer {
+interface Customer {
   contract: number;
   connection: number;
   full_name: string;
@@ -49,7 +49,7 @@ interface Custumer {
 }
 
 interface Props {
-  customer?: Custumer;
+  customer?: Customer;
   access_plans?: AccessPlan[];
   fix_ip_price: number;
   status?: "OK" | "Not Found";
@@ -172,7 +172,7 @@ const ChangeAddress = () => {
       <Title mt={20} order={2}>
         Novo endereço
       </Title>
-      <CustumerPainel {...data} />
+      <CustomerPainel {...data} />
       {data?.customer && (
         <>
           <Button mt={20} loading={isLoadingDocument} onClick={handleSubmit}>

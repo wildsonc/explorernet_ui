@@ -15,7 +15,7 @@ import { showNotification } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { ArrowRight, Businessplan } from "tabler-icons-react";
-import CustumerPainel from "../../components/CustomerPainel";
+import CustomerPainel from "../../components/CustomerPainel";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
 import hasPermission from "../../services/utils/hasPermission";
@@ -26,7 +26,7 @@ interface AccessPlan {
   value: number;
 }
 
-interface Custumer {
+interface Customer {
   contract: number;
   connection: number;
   full_name: string;
@@ -50,7 +50,7 @@ interface Custumer {
 }
 
 interface Props {
-  customer?: Custumer;
+  customer?: Customer;
   access_plans?: AccessPlan[];
   fix_ip_price: number;
   status?: "OK" | "Not Found";
@@ -196,7 +196,7 @@ const ChangePlan = () => {
           />
         </Group>
       </form>
-      <CustumerPainel {...data} />
+      <CustomerPainel {...data} />
       <Title mt={20} order={2}>
         Novo plano
       </Title>
