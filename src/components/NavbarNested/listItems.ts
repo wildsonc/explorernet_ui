@@ -119,6 +119,18 @@ export const listItems = [
         description: "Comercial → Vendedores",
       },
       {
+        label: "Planos",
+        link: "/sales/products",
+        role: "admin",
+        description: "Comercial → Planos",
+      },
+      {
+        label: "Franquias",
+        link: "/sales/franchise",
+        role: "admin",
+        description: "Comercial → Franquias",
+      },
+      {
         label: "Configuração",
         link: "/sales/settings",
         role: "admin",
@@ -218,6 +230,12 @@ export const listItems = [
         link: "/admin/databases",
         role: "admin",
         description: "Admin → Banco de dados",
+      },
+      {
+        label: "Cidades",
+        link: "/admin/cities",
+        role: "admin",
+        description: "Admin → Cidades",
       },
       {
         label: "Integrações",

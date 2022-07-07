@@ -71,6 +71,8 @@ export default function ActionsGrid() {
   const openModal = (title: string, children?: React.ReactNode) =>
     modals.openModal({
       title: <strong>{title}</strong>,
+      overlayOpacity: 0.55,
+      overlayBlur: 3,
       children,
     });
 

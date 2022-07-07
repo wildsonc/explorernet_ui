@@ -205,7 +205,7 @@ export default function UsersTable() {
     const keys = ["full_name", "email"];
     const query = search.toLowerCase().trim();
     return data.filter((item) =>
-      keys.some((key) => (item as any)[key].toLowerCase().includes(query))
+      keys.some((key) => (item as any)[key]?.toLowerCase().includes(query))
     );
   }
 
@@ -240,22 +240,24 @@ export default function UsersTable() {
         ))}
         {item.groups.length > 1 && (
           <Tooltip
-            wrapLines
-            width={105}
-            withArrow
-            transition="fade"
-            transitionDuration={200}
-            label={item.groups
-              .slice(1, item.groups.length)
-              .map((g) => groupColors[g.name].label + "\n")}
             position="right"
+            label={item.groups.map((e, i) => {
+              if (i > 0) {
+                return (
+                  <Text key={i} size="sm">
+                    {e.name}
+                  </Text>
+                );
+              }
+            })}
           >
             <Badge
+              size="sm"
               variant={theme.colorScheme === "dark" ? "light" : "outline"}
               color="gray"
               sx={{ marginLeft: 3 }}
             >
-              ...
+              <Text size="xs">+{item.groups.length - 1}</Text>
             </Badge>
           </Tooltip>
         )}
