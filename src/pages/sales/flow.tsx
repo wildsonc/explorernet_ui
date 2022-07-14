@@ -14,19 +14,31 @@ import {
   AccordionProps,
   MultiSelect,
   Loader,
+  Textarea,
+  Code,
+  ActionIcon,
+  Modal,
 } from "@mantine/core";
 import { useForm, formList } from "@mantine/form";
 import { useEffect, useState } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
-import { GripVertical, Message, HandClick, Check } from "tabler-icons-react";
+import {
+  GripVertical,
+  Message,
+  HandClick,
+  Check,
+  Trash,
+  Plus,
+} from "tabler-icons-react";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
 import hasPermission from "../../services/utils/hasPermission";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { showNotification } from "@mantine/notifications";
 import { steps } from "./_steps";
+import { useModals } from "@mantine/modals";
 
-const useStyles = createStyles((theme, _params, getRef) => ({
+const useStyles = createStyles((theme, _settings, getRef) => ({
   icon: { ref: getRef("icon") },
 
   control: {
@@ -71,9 +83,14 @@ function StyledAccordion(props: AccordionProps) {
 export default function Flow() {
   const { accessTokenPayload } = useSessionContext();
   const [loading, setLoading] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const [openedNode, setOpenedNode] = useState(false);
+  const [index, setIndex] = useState(0);
+  const modals = useModals();
   const form = useForm({
     initialValues: {
       loading: true,
+      key: "",
       steps: formList(steps),
     },
   });
@@ -83,7 +100,7 @@ export default function Flow() {
   useEffect(() => {
     api.get("api/sales/flow/1").then((res) => {
       const data = res.data["steps"];
-      form.setValues({ loading: false, steps: formList(data) });
+      form.setValues({ loading: false, key: "", steps: formList(data) });
     });
   }, []);
 
@@ -99,7 +116,7 @@ export default function Flow() {
     let steps = form.values.steps;
     steps.map((_, index) => {
       if (index == stepIndex) {
-        _.setting.messages?.map((e, i) => {
+        _.messages?.map((e, i) => {
           if (i == optionIndex) {
             e.value = value;
           }
@@ -117,7 +134,7 @@ export default function Flow() {
     let steps = form.values.steps;
     steps.map((_, index) => {
       if (index == stepIndex) {
-        _.setting.params?.map((e, i) => {
+        _.settings?.map((e, i) => {
           if (i == optionIndex) {
             e.value = value;
           }
@@ -135,7 +152,7 @@ export default function Flow() {
     let steps = form.values.steps;
     steps.map((_, index) => {
       if (index == stepIndex) {
-        _.setting.params?.map((e, i) => {
+        _.settings?.map((e, i) => {
           if (i == optionIndex) {
             if (value) e.value = value;
           }
@@ -148,6 +165,7 @@ export default function Flow() {
   const updateButtons = (
     stepIndex: number,
     value: string[],
+    optionIndex: number,
     add: boolean = false
   ) => {
     let steps = form.values.steps;
@@ -155,15 +173,128 @@ export default function Flow() {
 
     steps.map((_, index) => {
       if (index == stepIndex) {
-        if (add && _.setting.buttons)
-          newValue = [..._.setting.buttons, ...value];
-        _.setting.buttons = [...new Set(newValue)];
+        // @ts-ignore
+        if (add && _.messages[optionIndex].buttons)
+          // @ts-ignore
+          newValue = [..._.messages[optionIndex].buttons, ...value];
+        // @ts-ignore
+        _.messages[optionIndex].buttons = [...new Set(newValue)];
       }
     });
     form.setFieldValue("steps", steps);
   };
 
-  const fields = form.values.steps.map((_, index) => (
+  const addQuestion = () => {
+    let steps = form.values.steps;
+    steps.map((_, i) => {
+      if (index == i) {
+        _.messages?.push({
+          // @ts-ignore
+          key: form.values.key,
+          value: "",
+          type: "custom",
+        });
+      }
+    });
+    form.setFieldValue("steps", steps);
+    setOpened(false);
+    form.setFieldValue("key", "");
+  };
+
+  const addButton = (nodeIndex: number, messageIndex: number) => {
+    let steps = form.values.steps;
+    steps.map((_, index) => {
+      if (index == nodeIndex) {
+        _.messages?.map((e, i) => {
+          if (i == messageIndex) {
+            // @ts-ignore
+            _.messages[i]["buttons"] = [];
+          }
+        });
+      }
+    });
+    form.setFieldValue("steps", steps);
+  };
+
+  const addNode = () => {
+    form.addListItem("steps", {
+      func: "__generic_node",
+      label: form.values.key,
+      active: true,
+      messages: [],
+      type: "custom",
+    });
+    setOpenedNode(false);
+    form.setFieldValue("key", "");
+  };
+
+  const removeNode = (nodeIndex: number) => {
+    form.removeListItem("steps", nodeIndex);
+  };
+
+  const removeQuestion = (nodeIndex: number, questionIndex: number) => {
+    let steps = form.values.steps;
+    steps.map((_, index) => {
+      if (index == nodeIndex) {
+        _.messages = _.messages?.filter((e, i) => i != questionIndex);
+      }
+    });
+    form.setFieldValue("steps", steps);
+  };
+
+  const removeButtons = (nodeIndex: number, buttonIndex: number) => {
+    let steps = form.values.steps;
+    steps.map((_, index) => {
+      if (index == nodeIndex) {
+        _.messages?.map((e, i) => {
+          if (i == buttonIndex) {
+            // @ts-ignore
+            delete e["buttons"];
+          }
+        });
+      }
+    });
+    form.setFieldValue("steps", steps);
+  };
+
+  const removeButtonsIcon = (nodeIndex: number, index: number) => {
+    return (
+      <>
+        <ActionIcon color="red" onClick={() => removeButtons(nodeIndex, index)}>
+          <Trash size={16} />
+        </ActionIcon>
+      </>
+    );
+  };
+
+  const actionIcons = (nodeIndex: number, index: number) => {
+    return (
+      <>
+        <ActionIcon color="green" onClick={() => addButton(nodeIndex, index)}>
+          <HandClick size={16} />
+        </ActionIcon>
+        <ActionIcon
+          color="red"
+          onClick={() => removeQuestion(nodeIndex, index)}
+        >
+          <Trash size={16} />
+        </ActionIcon>
+      </>
+    );
+  };
+
+  const openDeleteModal = (index: number) =>
+    modals.openConfirmModal({
+      title: "Apagar node",
+      centered: true,
+      children: <Text>Você tem certeza que desejar apagar?</Text>,
+      labels: { confirm: "Apagar", cancel: "Cancelar" },
+      confirmProps: { color: "red" },
+      onCancel: () => {},
+      onConfirm: () => removeNode(index),
+    });
+
+  const fields = form.values.steps.map((_, index: number) => (
     <Draggable key={index} index={index} draggableId={index.toString()}>
       {(provided) => (
         <Box
@@ -210,66 +341,94 @@ export default function Flow() {
                     </Text>
                   }
                 >
-                  {form.values.steps[index].setting &&
-                    form.values.steps[index].setting.messages?.map((e, i) => (
-                      <TextInput
-                        label={e.label}
+                  {form.values.steps[index].messages?.map((e: any, i) => (
+                    <Box key={`${index}-${i}`}>
+                      <Textarea
+                        label={
+                          e.label ? (
+                            <>
+                              {e.label} <Code>{e.key}</Code>
+                            </>
+                          ) : (
+                            <Code color="indigo">{e.key}</Code>
+                          )
+                        }
                         value={e.value}
-                        key={`${index}-${i}`}
+                        autosize
                         onChange={(e) =>
                           updateMessage(index, i, e.currentTarget.value)
                         }
                         icon={<Message size={16} />}
+                        rightSection={
+                          e.type == "custom" ? actionIcons(index, i) : undefined
+                        }
+                        rightSectionWidth={70}
                         disabled={!_.active}
                       />
-                    ))}
-                  {form.values.steps[index].setting?.buttons && (
-                    <MultiSelect
-                      label="Botões"
-                      mt={10}
-                      key={`${index}`}
-                      creatable
-                      searchable
-                      disabled={!_.active}
-                      getCreateLabel={(query) => `+ Criar ${query}`}
-                      onCreate={(query) => updateButtons(index, [query], true)}
-                      value={form.values.steps[index].setting.buttons || []}
-                      data={form.values.steps[index].setting.buttons || []}
-                      onChange={(value) => updateButtons(index, value)}
-                      icon={<HandClick size={16} />}
-                    />
-                  )}
-                  {form.values.steps[index].setting &&
-                    form.values.steps[index].setting.params?.map((e, i) => {
-                      if (e.type == "switch") {
-                        return (
-                          <Switch
-                            label={e.label}
-                            key={`${index}-${i}`}
-                            disabled={!_.active}
-                            mt={20}
-                            // @ts-ignore
-                            checked={e.value}
-                            onChange={(event) =>
-                              updateCheck(index, i, event.currentTarget.checked)
-                            }
-                          />
-                        );
-                      } else if (e.type == "number") {
-                        return (
-                          <NumberInput
-                            mt={20}
-                            label={e.label}
-                            disabled={!_.active}
-                            key={`${index}-${i}`}
-                            precision={2}
-                            // @ts-ignore
-                            value={e.value}
-                            onChange={(v) => updateNumber(index, i, v)}
-                          />
-                        );
-                      }
-                    })}
+                      {e.buttons && (
+                        <MultiSelect
+                          mt={10}
+                          creatable
+                          searchable
+                          disabled={!_.active}
+                          getCreateLabel={(query) => `+ Criar ${query}`}
+                          onCreate={(query) =>
+                            updateButtons(index, [query], i, true)
+                          }
+                          value={e.buttons || []}
+                          data={e.buttons || []}
+                          onChange={(value) => updateButtons(index, value, i)}
+                          icon={<HandClick size={16} />}
+                          rightSection={
+                            e.type == "custom"
+                              ? removeButtonsIcon(index, i)
+                              : undefined
+                          }
+                        />
+                      )}
+                    </Box>
+                  ))}
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    mt={15}
+                    onClick={() => {
+                      setOpened(true);
+                      setIndex(index);
+                    }}
+                  >
+                    +
+                  </Button>
+                  {form.values.steps[index].settings?.map((e, i) => {
+                    if (e.type == "switch") {
+                      return (
+                        <Switch
+                          label={e.label}
+                          key={`${index}-${i}`}
+                          disabled={!_.active}
+                          mt={20}
+                          // @ts-ignore
+                          checked={e.value}
+                          onChange={(event) =>
+                            updateCheck(index, i, event.currentTarget.checked)
+                          }
+                        />
+                      );
+                    } else if (e.type == "number") {
+                      return (
+                        <NumberInput
+                          mt={20}
+                          label={e.label}
+                          disabled={!_.active}
+                          key={`${index}-${i}`}
+                          precision={2}
+                          // @ts-ignore
+                          value={e.value}
+                          onChange={(v) => updateNumber(index, i, v)}
+                        />
+                      );
+                    }
+                  })}
                 </Accordion.Item>
               </StyledAccordion>
             </Grid.Col>
@@ -280,6 +439,14 @@ export default function Flow() {
                     type: "checkbox",
                   })}
                 />
+                {form.values.steps[index].type != "default" && (
+                  <ActionIcon
+                    color="red"
+                    onClick={() => openDeleteModal(index)}
+                  >
+                    <Trash size={16} />
+                  </ActionIcon>
+                )}
               </Group>
             </Grid.Col>
           </Grid>
@@ -316,7 +483,7 @@ export default function Flow() {
           sx={{
             height: "calc(100vh - 40px)",
             minWidth: 600,
-            maxWidth: 800,
+            maxWidth: 600,
             "@media (max-width: 800px)": {
               minWidth: "calc(100vw - 20px)",
             },
@@ -344,6 +511,15 @@ export default function Flow() {
         </ScrollArea>
       </Center>
       <Button
+        sx={{ position: "absolute", top: 20, right: 20 }}
+        size="md"
+        variant="outline"
+        onClick={() => setOpenedNode(true)}
+        leftIcon={<Plus size={16} />}
+      >
+        Node
+      </Button>
+      <Button
         sx={{ position: "absolute", bottom: 20, right: 20 }}
         size="lg"
         onClick={handleSubmit}
@@ -351,6 +527,32 @@ export default function Flow() {
       >
         {loading ? "Salvando" : "Salvar"}
       </Button>
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="Nova pergunta"
+      >
+        <TextInput label="Identificador" {...form.getInputProps("key")} />
+        <Group mt={20} position="right">
+          <Button color="dark" onClick={() => setOpened(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={addQuestion}>Adicionar</Button>
+        </Group>
+      </Modal>
+      <Modal
+        opened={openedNode}
+        onClose={() => setOpenedNode(false)}
+        title="Novo bloco"
+      >
+        <TextInput label="Nome" {...form.getInputProps("key")} />
+        <Group mt={20} position="right">
+          <Button color="dark" onClick={() => setOpenedNode(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={addNode}>Adicionar</Button>
+        </Group>
+      </Modal>
     </>
   );
 }

@@ -75,7 +75,7 @@ const useStyles = createStyles((theme) => ({
 
 const groupColors: any = {
   sales: { color: "green", label: "Comercial" },
-  router: { color: "indigo", label: "Rotas" },
+  route: { color: "indigo", label: "Rotas" },
   finance: { color: "yellow", label: "Financeiro" },
   support: { color: "pink", label: "ServiceDesk" },
   admin: { color: "cyan", label: "Admin" },
@@ -245,7 +245,7 @@ export default function UsersTable() {
               if (i > 0) {
                 return (
                   <Text key={i} size="sm">
-                    {e.name}
+                    {groupColors[e.name].label}
                   </Text>
                 );
               }

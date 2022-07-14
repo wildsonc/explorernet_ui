@@ -14,6 +14,7 @@ import {
   useMantineTheme,
   Loader,
   Switch,
+  Box,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";
@@ -180,7 +181,7 @@ export default function SellerTable() {
             type="always"
           >
             {user.monday_columns?.map((e) => (
-              <>
+              <Box key={e.id}>
                 <Text lineClamp={1}>{e.title}</Text>
                 <Text
                   color="dimmed"
@@ -191,7 +192,7 @@ export default function SellerTable() {
                 >
                   {e.id}
                 </Text>
-              </>
+              </Box>
             ))}
           </ScrollArea>
           <Center>

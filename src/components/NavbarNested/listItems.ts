@@ -8,6 +8,7 @@ import {
   UserCheck,
   Ad2,
   BuildingStore,
+  Route,
 } from "tabler-icons-react";
 
 export const listItems = [
@@ -98,6 +99,25 @@ export const listItems = [
         link: "/marketing/map",
         role: "view_marketing",
         description: "Marketing → Mapa",
+      },
+    ],
+  },
+  {
+    label: "Rotas",
+    icon: Route,
+    role: "view_route",
+    links: [
+      {
+        label: "Enviar mensagem",
+        link: "/route/message",
+        role: "view_route",
+        description: "Rotas → Enviar mensagem",
+      },
+      {
+        label: "Histórico",
+        link: "/route/history",
+        role: "view_route",
+        description: "Rotas → Histórico",
       },
     ],
   },

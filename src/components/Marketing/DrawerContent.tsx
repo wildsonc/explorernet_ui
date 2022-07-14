@@ -1,10 +1,10 @@
-import { Timeline, Text, Group, Button, ScrollArea } from "@mantine/core";
-import { useQuery } from "react-query";
-import { Plus, Pencil, Check, MapPin, Trash } from "tabler-icons-react";
-import api from "../../services/api";
+import { Button, Group, ScrollArea, Text, Timeline } from "@mantine/core";
+import bbox from "@turf/bbox";
 import moment from "moment";
 import "moment/locale/pt-br";
-import bbox from "@turf/bbox";
+import { useQuery } from "react-query";
+import { MapPin, Plus, Trash } from "tabler-icons-react";
+import api from "../../services/api";
 
 interface Props {
   id: number;

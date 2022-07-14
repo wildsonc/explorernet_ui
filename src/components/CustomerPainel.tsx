@@ -15,6 +15,7 @@ interface Customer {
   state: string;
   tax_id: string;
   phone: string;
+  phone2?: string;
   access_plan: string;
   company_real_name: string;
   franchise: string;
@@ -53,7 +54,10 @@ const CustomerPainel = ({ customer }: Props) => {
         </Group>
         <Group>
           <BrandWhatsapp size={20} />
-          <Text>{customer.phone}</Text>
+          <Text>
+            {customer.phone}
+            {customer.phone2 ? ` | ${customer.phone2}` : null}
+          </Text>
         </Group>
       </Paper>
     </>
