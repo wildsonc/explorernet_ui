@@ -35,7 +35,7 @@ import api from "../../services/api";
 import hasPermission from "../../services/utils/hasPermission";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { showNotification } from "@mantine/notifications";
-import { steps } from "./_steps";
+import { steps } from "../../services/steps";
 import { useModals } from "@mantine/modals";
 
 const useStyles = createStyles((theme, _settings, getRef) => ({
