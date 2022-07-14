@@ -102,10 +102,9 @@ function AutoSaveMarkdownTextarea(props: Props) {
               </Text>
             </Group>
           )}
-          <ReactMarkdown
-            children={currentValue.replaceAll("*", "**").replaceAll("-", "\\-")}
-            className={classes.markdown}
-          />
+          <ReactMarkdown className={classes.markdown}>
+            {currentValue.replaceAll("*", "**").replaceAll("-", "\\-")}
+          </ReactMarkdown>
         </Box>
       )}
     </Group>

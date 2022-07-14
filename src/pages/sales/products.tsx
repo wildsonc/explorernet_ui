@@ -56,8 +56,7 @@ interface cityProps {
   is_active: boolean;
 }
 
-export default function productTable() {
-  const theme = useMantineTheme();
+export default function Products() {
   const modals = useModals();
   const [opened, setOpened] = useState(false);
   const [product, setProduct] = useState<ProductProps>();
@@ -205,8 +204,8 @@ export default function productTable() {
       <td>
         <Center>
           <Group spacing="xs" noWrap>
-            {item.companies.map((e) => (
-              <Badge color={e == "Explorernet" ? "orange" : "pink"}>
+            {item.companies.map((e, i) => (
+              <Badge key={i} color={e == "Explorernet" ? "orange" : "pink"}>
                 {e == "Explorernet" ? "EXP" : "IUP"}
               </Badge>
             ))}

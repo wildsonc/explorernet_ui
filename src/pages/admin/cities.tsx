@@ -28,8 +28,7 @@ interface CityProps {
   is_active: boolean;
 }
 
-export default function citysTable() {
-  const theme = useMantineTheme();
+export default function Cities() {
   const modals = useModals();
   const [opened, setOpened] = useState(false);
   const [city, setCity] = useState<CityProps>();

@@ -43,7 +43,7 @@ interface cityProps {
   is_active: boolean;
 }
 
-export default function franchiseTable() {
+export default function Franchise() {
   const modals = useModals();
   const [opened, setOpened] = useState(false);
   const [franchise, setFranchise] = useState<FranchiseProps>();
@@ -191,8 +191,8 @@ export default function franchiseTable() {
       <td>
         <Center>
           <Group spacing="xs" noWrap>
-            {item.companies.map((e) => (
-              <Badge color={e == "Explorernet" ? "orange" : "pink"}>
+            {item.companies.map((e, i) => (
+              <Badge key={i} color={e == "Explorernet" ? "orange" : "pink"}>
                 {e == "Explorernet" ? "EXP" : "IUP"}
               </Badge>
             ))}

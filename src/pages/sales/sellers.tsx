@@ -53,7 +53,7 @@ interface SellerProps {
   created_at: string;
 }
 
-export default function SellerTable() {
+export default function Seller() {
   const theme = useMantineTheme();
   const modals = useModals();
   const [opened, setOpened] = useState(false);
