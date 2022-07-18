@@ -54,8 +54,8 @@ export function UserButton({ name, email, icon, ...others }: UserButtonProps) {
 
   return (
     <Box className={classes.user} {...others}>
-      <Group onClick={() => handlers.toggle()}>
-        <Avatar radius="xl">{name.slice(0, 1)}</Avatar>
+      <Group onClick={() => handlers.toggle()} noWrap>
+        {/* <Avatar radius="xl">{name.slice(0, 1)}</Avatar> */}
 
         <div style={{ flex: 1 }}>
           <Text size="sm" weight={500}>

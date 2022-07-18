@@ -4,30 +4,33 @@ import {
   Box,
   Button,
   Center,
+  Code,
+  Divider,
   Group,
   SegmentedControl,
   Select,
-  TextInput,
   Text,
-  Code,
-  Divider,
+  TextInput,
+  MultiSelect,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { formList, useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import {
+  ArrowRightCircle,
   Backhoe,
   BrandAndroid,
   BrandGoogleDrive,
-  BrandTelegram,
   FileInvoice,
   Link,
   Messages,
   Plug,
   Satellite,
+  Sitemap,
+  Trash,
 } from "tabler-icons-react";
 import AutoSaveMarkdownTextarea from "../../components/AutoSave/AutoSaveMarkdownTextarea";
 import AutoSaveTextInput from "../../components/AutoSave/AutoSaveTextInput";
@@ -45,28 +48,39 @@ interface SettingProps {
   bot_token: string;
   drive_folder: string;
   maintenance: string;
+  mapping: any;
+  exclude_summary: string[];
+  exclude_edit: string[];
 }
 
 export default function Bot() {
   const { accessTokenPayload } = useSessionContext();
   const [drives, setDrives] = useState<DriveProps[]>([]);
+  const [fields, setFields] = useState([""]);
   const [selected, setSelected] = useState("drive");
   const form = useForm({
     initialValues: {
       folder: "",
       token: "",
       maintenance: "",
+      mapping: formList([{ source: "", destination: "" }]),
+      exclude_summary: [""],
+      exclude_edit: [""],
     },
   });
 
   useEffect(() => {
-    api.get<SettingProps>("/api/sales/settings").then((res) =>
+    api.get<SettingProps>("/api/sales/settings").then((res) => {
+      setFields([...res.data.exclude_summary, ...res.data.exclude_edit]);
       form.setValues({
         folder: res.data.drive_folder,
         token: res.data.bot_token,
         maintenance: res.data.maintenance,
-      })
-    );
+        mapping: formList(res.data.mapping),
+        exclude_summary: res.data.exclude_summary,
+        exclude_edit: res.data.exclude_edit,
+      });
+    });
   }, []);
 
   useEffect(() => {
@@ -190,6 +204,58 @@ export default function Bot() {
     api.post("api/key", { key: "BOT_MAINTENANCE", value: newState });
   };
 
+  const handleSubmitSync = () => {
+    api
+      .post("/api/sales/settings", { mapping: form.values.mapping })
+      .then((res) => {
+        showNotification({
+          title: "Salvo com sucesso",
+          message: "Mapeamento salvo",
+          color: "green",
+        });
+      });
+  };
+
+  const handleSubmitBot = () => {
+    api
+      .put("/api/sales/flow/1", {
+        exclude_edit: form.values.exclude_edit,
+        exclude_summary: form.values.exclude_summary,
+      })
+      .then((res) => {
+        showNotification({
+          title: "Salvo com sucesso",
+          message: "Atualizado",
+          color: "green",
+        });
+      });
+  };
+
+  const mapping = form.values.mapping.map((item, index) => (
+    <Group key={index} mt="xs">
+      <TextInput
+        placeholder="nome_mae"
+        required
+        sx={{ flex: 1 }}
+        {...form.getListInputProps("mapping", index, "source")}
+      />
+      <ArrowRightCircle size={20} />
+      <TextInput
+        placeholder="Nome Mãe"
+        required
+        sx={{ flex: 1 }}
+        {...form.getListInputProps("mapping", index, "destination")}
+      />
+      <ActionIcon
+        color="red"
+        variant="hover"
+        onClick={() => form.removeListItem("mapping", index)}
+      >
+        <Trash size={16} />
+      </ActionIcon>
+    </Group>
+  ));
+
   return (
     <>
       <SegmentedControl
@@ -215,6 +281,15 @@ export default function Bot() {
             ),
           },
           {
+            value: "mapping",
+            label: (
+              <Center>
+                <Sitemap size={16} />
+                <Box ml={10}>Sync</Box>
+              </Center>
+            ),
+          },
+          {
             value: "bot",
             label: (
               <Center>
@@ -228,7 +303,7 @@ export default function Bot() {
             label: (
               <Center>
                 <Messages size={16} />
-                <Box ml={10}>Mensagens Predefinidas</Box>
+                <Box ml={10}>Mensagens</Box>
               </Center>
             ),
           },
@@ -253,9 +328,52 @@ export default function Bot() {
       )}
       {selected == "contract" && (
         <Box mt={10}>
-          <TextInput label="UNICO Template" sx={{ maxWidth: 300 }} />
-          <TextInput label="Template PF" sx={{ maxWidth: 300 }} />
-          <TextInput label="Template PJ" sx={{ maxWidth: 300 }} />
+          <AutoSaveTextInput
+            label="Template Adesão"
+            name="BOT_TEMPLATE_ADESAO"
+            sx={{ maxWidth: 300 }}
+          />
+          <AutoSaveTextInput
+            label="Template Adesão PJ"
+            name="BOT_TEMPLATE_ADESAO_PJ"
+            sx={{ maxWidth: 300 }}
+          />
+        </Box>
+      )}
+      {selected == "mapping" && (
+        <Box mt={10} sx={{ maxWidth: 480 }}>
+          <Text weight={500} size="xl" mb={10}>
+            Mapeamento de colunas
+          </Text>
+          {mapping.length > 0 ? (
+            <Group mb="xs">
+              <Text weight={500} size="sm" sx={{ flex: 1 }}>
+                Key
+              </Text>
+              <Text weight={500} size="sm" pr={90}>
+                Coluna
+              </Text>
+            </Group>
+          ) : (
+            <Text color="dimmed" align="center">
+              Nenhum mapeamento
+            </Text>
+          )}
+
+          {mapping}
+
+          <Group position="center" mt="md">
+            <Button
+              onClick={() =>
+                form.addListItem("mapping", { source: "", destination: "" })
+              }
+            >
+              + Coluna
+            </Button>
+            <Button color="green" onClick={handleSubmitSync}>
+              Salvar
+            </Button>
+          </Group>
         </Box>
       )}
       {selected == "bot" && (
@@ -296,6 +414,31 @@ export default function Bot() {
                 : "Manutenção"}
             </Button>
           </Group>
+          <MultiSelect
+            label="Excluir campos resumo"
+            data={fields}
+            sx={{ maxWidth: 480 }}
+            mt={20}
+            {...form.getInputProps("exclude_summary")}
+            searchable
+            creatable
+            getCreateLabel={(query) => `+ ${query}`}
+            onCreate={(query) => setFields((current) => [...current, query])}
+          />
+          <MultiSelect
+            label="Excluir campos edição"
+            data={fields}
+            sx={{ maxWidth: 480 }}
+            mt={10}
+            {...form.getInputProps("exclude_edit")}
+            searchable
+            creatable
+            getCreateLabel={(query) => `+ ${query}`}
+            onCreate={(query) => setFields((current) => [...current, query])}
+          />
+          <Button mt={20} onClick={handleSubmitBot}>
+            Salvar
+          </Button>
         </Box>
       )}
       {selected == "messages" && (

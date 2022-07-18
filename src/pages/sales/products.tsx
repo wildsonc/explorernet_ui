@@ -16,7 +16,6 @@ import {
   Text,
   TextInput,
   Tooltip,
-  useMantineTheme,
 } from "@mantine/core";
 import { formList, useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";

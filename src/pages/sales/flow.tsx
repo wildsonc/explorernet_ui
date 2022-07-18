@@ -13,6 +13,7 @@ import {
   createStyles,
   AccordionProps,
   MultiSelect,
+  Select,
   Loader,
   Textarea,
   Code,
@@ -29,6 +30,7 @@ import {
   Check,
   Trash,
   Plus,
+  Folder,
 } from "tabler-icons-react";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
@@ -85,6 +87,11 @@ export default function Flow() {
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const [openedNode, setOpenedNode] = useState(false);
+  const [folderData, setFolderData] = useState([
+    "Outros",
+    "Cliente",
+    "Contrato",
+  ]);
   const [index, setIndex] = useState(0);
   const modals = useModals();
   const form = useForm({
@@ -100,6 +107,7 @@ export default function Flow() {
   useEffect(() => {
     api.get("api/sales/flow/1").then((res) => {
       const data = res.data["steps"];
+      setFolderData(res.data["folders"]);
       form.setValues({ loading: false, key: "", steps: formList(data) });
     });
   }, []);
@@ -189,10 +197,10 @@ export default function Flow() {
     steps.map((_, i) => {
       if (index == i) {
         _.messages?.push({
-          // @ts-ignore
           key: form.values.key,
           value: "",
           type: "custom",
+          label: "",
         });
       }
     });
@@ -221,6 +229,7 @@ export default function Flow() {
       func: "__generic_node",
       label: form.values.key,
       active: true,
+      folder: "",
       messages: [],
       type: "custom",
     });
@@ -429,6 +438,19 @@ export default function Flow() {
                       );
                     }
                   })}
+                  <Select
+                    data={folderData}
+                    label="Grupo"
+                    mt={20}
+                    icon={<Folder size={16} />}
+                    searchable
+                    creatable
+                    getCreateLabel={(query) => `+ Criar ${query}`}
+                    onCreate={(query) =>
+                      setFolderData((current) => [...current, query])
+                    }
+                    {...form.getListInputProps("steps", index, "folder")}
+                  />
                 </Accordion.Item>
               </StyledAccordion>
             </Grid.Col>
@@ -457,15 +479,17 @@ export default function Flow() {
 
   const handleSubmit = () => {
     setLoading(true);
-    api.put("api/sales/flow/1", form.values).then((res) => {
-      showNotification({
-        color: "teal",
-        title: "Sucesso",
-        message: "Alterações aplicadas",
-        icon: <Check />,
+    api
+      .put("api/sales/flow/1", { ...form.values, folders: folderData })
+      .then((res) => {
+        showNotification({
+          color: "teal",
+          title: "Sucesso",
+          message: "Alterações aplicadas",
+          icon: <Check />,
+        });
+        setLoading(false);
       });
-      setLoading(false);
-    });
   };
 
   if (form.values.loading) {

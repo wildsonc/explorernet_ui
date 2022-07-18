@@ -23,7 +23,6 @@ import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { Building, Pencil, Plus, Search, Trash } from "tabler-icons-react";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
-import { formatDate } from "../../services/utils/formatDate";
 import hasPermission from "../../services/utils/hasPermission";
 
 interface FranchiseProps {
@@ -31,6 +30,7 @@ interface FranchiseProps {
   name: string;
   trade_name: string;
   cnpj: string;
+  phone: string;
   cities: string[];
   companies: string[];
   updated_at: string;
@@ -57,6 +57,7 @@ export default function Franchise() {
       name: "",
       trade_name: "",
       cnpj: "",
+      phone: "",
       cities: ["Todas"],
       companies: ["Explorernet", "Internetup"],
     },
@@ -130,6 +131,7 @@ export default function Franchise() {
       trade_name: p.trade_name,
       name: p.name,
       cities: p.cities,
+      phone: p.phone,
       companies: p.companies,
     });
   };
@@ -176,7 +178,7 @@ export default function Franchise() {
   const rows = sortedData.map((item) => (
     <tr key={item.id}>
       <td>
-        <Group spacing="sm">
+        <Group spacing="sm" noWrap>
           <Avatar size={30} radius={30}>
             <Building size={16} />
           </Avatar>
@@ -227,16 +229,13 @@ export default function Franchise() {
         </Center>
       </td>
       <td>
+        <Center>{item.phone}</Center>
+      </td>
+      <td>
         <Center>{item.cnpj}</Center>
       </td>
       <td>
-        <Center>{formatDate(item.created_at)}</Center>
-      </td>
-      <td>
-        <Center>{formatDate(item.updated_at)}</Center>
-      </td>
-      <td>
-        <Group spacing={0} position="right">
+        <Group spacing={0} position="right" noWrap>
           <ActionIcon
             onClick={() => {
               edit(item);
@@ -293,13 +292,10 @@ export default function Franchise() {
                 <Center>Cidades</Center>
               </th>
               <th>
+                <Center>Telefone</Center>
+              </th>
+              <th>
                 <Center>CNPJ</Center>
-              </th>
-              <th>
-                <Center>Criado</Center>
-              </th>
-              <th>
-                <Center>Atualizado</Center>
               </th>
               <th />
             </tr>
@@ -324,6 +320,11 @@ export default function Franchise() {
             <TextInput
               label="Nome Fantasia"
               {...form.getInputProps("trade_name")}
+              required
+            />
+            <TextInput
+              label="Telefone"
+              {...form.getInputProps("phone")}
               required
             />
             <TextInput label="CNPJ" {...form.getInputProps("cnpj")} required />

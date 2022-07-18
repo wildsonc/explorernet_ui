@@ -1,13 +1,14 @@
 export const steps = [
   {
-    func: "contact_origin",
-    label: "Meio de contato",
+    func: "generic_node",
     type: "custom",
-    active: true,
+    label: "Meio de contato",
+    active: false,
+    folder: "",
     messages: [
       {
         key: "meio_de_contato",
-        type: "default",
+        type: "custom",
         value: "Meio de contato?",
         buttons: ["URA", "Whatsapp", "Funil"],
       },
@@ -15,41 +16,44 @@ export const steps = [
   },
   {
     func: "spc",
-    label: "Consultar documento",
     type: "default",
-    active: true,
+    label: "Consultar documento",
+    active: false,
+    folder: "",
     messages: [
       { key: "documento", type: "default", value: "Digite o *CPF/CNPJ*" },
       { key: "nome", type: "default", value: "Qual o nome do cliente?" },
-      { key: "mãe", type: "default", value: "Qual o nome da mãe?" },
+      { key: "mãe", type: "custom", value: "Qual o nome da mãe?" },
       {
-        key: "system",
-        type: "system_1",
+        key: "system_1",
+        type: "system",
         label: "Nenhuma pendência",
         value: "✅ *Nenhuma* pendência encontrada",
       },
       {
         key: "ignore_spc",
-        type: "system_2",
+        type: "system",
         label: "Com pendência",
         value:
           "💰 Existem pendências para esse cliente no valor de *R$ {SPC_TOTAL}*\n\nAinda deseja realizar o cadastro?",
         buttons: ["True@Sim", "False@Não"],
       },
+      { key: "RG/IE", type: "custom", value: "Digite o RG/IE" },
     ],
     settings: [
       { type: "switch", label: "Permitir consulta de CNPJ", value: true },
     ],
   },
   {
-    func: "company",
-    label: "Empresa",
+    func: "generic_node",
     type: "custom",
-    active: true,
+    label: "Empresa",
+    active: false,
+    folder: "",
     messages: [
       {
         key: "empresa",
-        type: "default",
+        type: "custom",
         value: "Empresa?",
         buttons: ["Explorernet", "Internetup"],
       },
@@ -57,9 +61,10 @@ export const steps = [
   },
   {
     func: "address",
-    label: "Endereço",
     type: "default",
+    label: "Endereço",
     active: true,
+    folder: "",
     messages: [
       { key: "cep", type: "default", value: "Digite o CEP" },
       { key: "cidade", type: "default", value: "Cidade" },
@@ -72,32 +77,54 @@ export const steps = [
         buttons: ["GO", "DF"],
       },
       { key: "complemento", type: "default", value: "Complemento" },
+      {
+        key: "número",
+        type: "custom",
+        value: "Número",
+        buttons: ["S/N"],
+      },
     ],
   },
   {
     func: "viability",
-    label: "Viabilidade",
     type: "default",
+    label: "Viabilidade",
     active: false,
+    folder: "",
     messages: [
       {
-        key: "location",
-        type: "default",
-        value: "Envie a localização do cliente",
+        key: "system_1",
+        type: "system",
+        label: "Com viabilidade",
+        value: "No local {CIDADE}, {LOGRADOURO}, possuímos viabilidade",
+      },
+      {
+        key: "viabilidade",
+        type: "system",
+        label: "Sem viabilidade",
+        value: "Não possuímos viabilidade ainda nesse local",
+        buttons: ["Continuar", "Enviar coordenadas", "Finalizar"],
+      },
+      {
+        key: "system_3",
+        type: "system",
+        label: "Info",
+        value: "Informe as observações relacionadas a essa venda:",
       },
     ],
     settings: [{ type: "number", label: "Raio", value: 300 }],
   },
   {
     func: "product",
-    label: "Planos",
     type: "default",
+    label: "Planos",
     active: true,
+    folder: "",
     messages: [
       { key: "plano", type: "default", value: "Escolha o plano" },
       {
         key: "ip_fixo",
-        type: "default",
+        type: "custom",
         value: "IP fixo?",
         buttons: ["True@Sim", "False@Não"],
       },
@@ -106,10 +133,10 @@ export const steps = [
   },
   {
     func: "payment",
-    label: "Taxa",
     type: "default",
-
-    active: true,
+    label: "Taxa",
+    active: false,
+    folder: "",
     messages: [
       {
         key: "taxa",
@@ -127,14 +154,15 @@ export const steps = [
     ],
   },
   {
-    func: "due_date",
-    label: "Data do vencimento",
+    func: "generic_node",
     type: "custom",
-    active: true,
+    label: "Data do vencimento",
+    active: false,
+    folder: "",
     messages: [
       {
         key: "vencimento",
-        type: "default",
+        type: "custom",
         value: "Data do vencimento:",
         buttons: ["5", "10", "15", "20", "25"],
       },
@@ -142,9 +170,10 @@ export const steps = [
   },
   {
     func: "contact",
-    label: "Contato",
     type: "default",
+    label: "Contato",
     active: false,
+    folder: "",
     messages: [
       {
         key: "telefone",
@@ -156,20 +185,41 @@ export const steps = [
         type: "custom",
         value: "Informe mais um número para contato",
       },
+      {
+        key: "system_1",
+        type: "system",
+        label: "Telefone inválido",
+        value: "❌ Telefone *inválido*",
+      },
+      {
+        key: "system_2",
+        type: "system",
+        label: "Sem WhatsApp",
+        value: "📲 O telefone deve possuir *Whatsapp*",
+      },
     ],
     settings: [
       {
         type: "switch",
         label: "Validar apenas o primeiro número",
-        value: true,
+        value: false,
       },
     ],
   },
   {
+    func: "generic_node",
+    type: "custom",
+    label: "Observação",
+    active: false,
+    folder: "",
+    messages: [{ key: "observações", type: "custom", value: "Observações?" }],
+  },
+  {
     func: "address_proof",
-    label: "Comprovante",
     type: "default",
-    active: true,
+    label: "Comprovante",
+    active: false,
+    folder: "",
     messages: [
       {
         key: "address_proof",
@@ -184,12 +234,5 @@ export const steps = [
         value: false,
       },
     ],
-  },
-  {
-    func: "observation",
-    label: "Observação",
-    type: "custom",
-    active: true,
-    messages: [{ key: "observações", type: "default", value: "Observações?" }],
   },
 ];

@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import React from "react";
-import { BrandTelegram, BrandWhatsapp, Mail } from "tabler-icons-react";
+import { BrandTelegram, World, Mail, Box } from "tabler-icons-react";
 import AutoSaveTextInput from "../../components/AutoSave/AutoSaveTextInput";
 import _3CXIcon from "../../components/Icons/3CXIcon";
 import _7AZIcon from "../../components/Icons/7AZIcon";
@@ -22,6 +22,7 @@ import ZapSignIcon from "../../components/Icons/ZapSignIcon";
 import TemplateIcon from "../../components/Icons/ApiTemplateIcon";
 import UnicoIcon from "../../components/Icons/UnicoIcon";
 import SpcIcon from "../../components/Icons/SpcIcon";
+import GoogleMapsIcon from "../../components/Icons/GoogleMapsIcon";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -224,6 +225,39 @@ export default function ActionsGrid() {
         <>
           <AutoSaveTextInput label="API Key" name="APITEMPLATE_KEY" />
           <AutoSaveTextInput label="Endpoint" name="APITEMPLATE_URL" />
+        </>
+      ),
+    },
+    {
+      title: "GeoGrid",
+      icon: World,
+      color: "cyan",
+      children: (
+        <>
+          <AutoSaveTextInput label="Token" name="GEOGRID_TOKEN" />
+          <AutoSaveTextInput label="URL" name="GEOGRID_URL" />
+        </>
+      ),
+    },
+    {
+      title: "Geocoding",
+      icon: GoogleMapsIcon,
+      color: "cyan",
+      children: (
+        <>
+          <AutoSaveTextInput label="Geocoding API" name="GEOCODING_API" />
+        </>
+      ),
+    },
+    {
+      title: "MK",
+      icon: Box,
+      color: "blue",
+      children: (
+        <>
+          <AutoSaveTextInput label="URL" name="MK_API_URL" />
+          <AutoSaveTextInput label="Token" name="MK_API_TOKEN" />
+          <AutoSaveTextInput label="Password" name="MK_API_PASSWORD" />
         </>
       ),
     },

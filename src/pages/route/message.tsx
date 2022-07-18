@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Anchor,
   Badge,
   Button,
   Center,
@@ -18,7 +17,7 @@ import { useModals } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
-import { ArrowRight, Send, Settings, History } from "tabler-icons-react";
+import { ArrowRight, History, Send, Settings } from "tabler-icons-react";
 import AutoSaveTextInput from "../../components/AutoSave/AutoSaveTextInput";
 import CustomerPainel from "../../components/CustomerPainel";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
@@ -100,7 +99,7 @@ const SendMessage = () => {
 
   const roles = accessTokenPayload.roles;
 
-  if (!hasPermission("view_finance", roles)) {
+  if (!hasPermission("view_route", roles)) {
     return <NotAuthorized />;
   }
 

@@ -25,6 +25,7 @@ import hasPermission from "../../services/utils/hasPermission";
 interface CityProps {
   id: number;
   name: string;
+  state: string;
   is_active: boolean;
 }
 
@@ -39,6 +40,7 @@ export default function Cities() {
   const form = useForm({
     initialValues: {
       name: "",
+      state: "",
     },
   });
 
@@ -94,7 +96,7 @@ export default function Cities() {
   };
 
   const edit = (city: CityProps) => {
-    form.setValues({ name: city.name });
+    form.setValues({ name: city.name, state: city.state });
     setCity(city);
     setOpened(true);
   };
@@ -142,6 +144,7 @@ export default function Cities() {
   const rows = sortedData.map((item) => (
     <tr key={item.id}>
       <td>{item.name}</td>
+      <td>{item.state}</td>
       <td>
         <Group spacing={0} position="right">
           <ActionIcon
@@ -188,6 +191,7 @@ export default function Cities() {
           <thead>
             <tr>
               <th>Nome</th>
+              <th>UF</th>
               <th />
             </tr>
           </thead>
@@ -201,6 +205,7 @@ export default function Cities() {
         >
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <TextInput label="Nome" {...form.getInputProps("name")} />
+            <TextInput label="UF" {...form.getInputProps("state")} />
             <Group position="right" sx={{ marginTop: 20 }}>
               <Button color="gray" onClick={() => setOpened(false)}>
                 Cancelar

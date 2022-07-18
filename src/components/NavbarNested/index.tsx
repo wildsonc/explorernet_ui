@@ -21,9 +21,10 @@ import { useViewportSize } from "@mantine/hooks";
 
 interface Props {
   opened: boolean;
+  setOpened: (value: boolean) => void;
 }
 
-export function NavbarNested({ opened }: Props) {
+export function NavbarNested({ opened, setOpened }: Props) {
   let { accessTokenPayload } = useSessionContext();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const { classes } = useStyles();
@@ -37,6 +38,9 @@ export function NavbarNested({ opened }: Props) {
       }
     });
   }, []);
+  useEffect(() => {
+    setOpened(false);
+  }, [router.pathname]);
 
   const dark = colorScheme === "dark";
 
@@ -71,7 +75,7 @@ export function NavbarNested({ opened }: Props) {
       nothingFoundMessage="Nada encontrado..."
     >
       <Navbar
-        width={{ sm: 200, lg: 250 }}
+        width={{ sm: 240 }}
         hiddenBreakpoint="sm"
         hidden={!opened}
         p="md"

@@ -113,7 +113,9 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
                   <AppShell
                     fixed
                     navbarOffsetBreakpoint="sm"
-                    navbar={<NavbarNested opened={opened} />}
+                    navbar={
+                      <NavbarNested opened={opened} setOpened={setOpened} />
+                    }
                     header={
                       width < 769 ? (
                         <Header
