@@ -9,8 +9,9 @@ import {
   Center,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import { useEffect, useState, memo } from "react";
+import { useState, memo } from "react";
 import ReactMarkdown from "react-markdown";
+import { useQuery } from "react-query";
 import { ArrowBack, Check, DeviceFloppy, Eye } from "tabler-icons-react";
 import api from "../../services/api";
 
@@ -26,19 +27,32 @@ interface Props extends TextareaProps {
   showpreviewtitle?: string;
 }
 
+interface KeyProps {
+  key: string;
+  value: string;
+}
+
 function AutoSaveMarkdownTextarea(props: Props) {
-  const [value, setValue] = useState("");
-  const [currentValue, setCurrentValue] = useState("");
+  const [value, setValue] = useState("Carregando...");
+  const [currentValue, setCurrentValue] = useState("Carregando...");
   const { classes } = useStyles();
 
-  useEffect(() => {
-    const getValue = async () => {
+  const { data, refetch } = useQuery<KeyProps, Error>(
+    `KEY_${props.name}`,
+    async () => {
       const response = await api.get(`api/key?name=${props.name}`);
-      setValue(response.data.value);
-      setCurrentValue(response.data.value);
-    };
-    getValue();
-  }, []);
+      return response.data;
+    },
+    {
+      staleTime: 1000 * 60,
+    }
+  );
+
+  if (data) {
+    if (value == "Carregando...") setValue(data.value);
+    if (currentValue == "Carregando...") setCurrentValue(data.value);
+  }
+
   const showPreview =
     props.showpreview == undefined
       ? true
@@ -63,7 +77,8 @@ function AutoSaveMarkdownTextarea(props: Props) {
           color: "green",
           icon: <Check />,
         });
-      });
+      })
+      .then((res) => refetch());
   };
 
   return (

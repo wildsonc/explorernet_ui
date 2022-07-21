@@ -7,7 +7,7 @@ const SvgComponent = (
     xmlns="http://www.w3.org/2000/svg"
     xmlSpace="preserve"
     width={50}
-    height={50}
+    height={40}
     viewBox="0 -1000 4791.76 1858.11"
     {...props}
   >

@@ -5,7 +5,7 @@ function Icon() {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="50"
-      height="50"
+      height="40"
       viewBox="-116.685 -608.925 1011.27 1673.55"
     >
       <g fill="none">

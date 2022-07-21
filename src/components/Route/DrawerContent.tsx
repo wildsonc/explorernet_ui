@@ -20,10 +20,16 @@ interface Props {
 }
 
 export default function DrawerContent() {
-  const { data } = useQuery<Props[], Error>("route-history", async () => {
-    const response = await api.get(`api/route/history`);
-    return response.data;
-  });
+  const { data } = useQuery<Props[], Error>(
+    "route-history",
+    async () => {
+      const response = await api.get(`api/route/history`);
+      return response.data;
+    },
+    {
+      staleTime: 1000 * 5,
+    }
+  );
 
   if (!data) return null;
 

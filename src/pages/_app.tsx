@@ -33,6 +33,7 @@ import { queryClient } from "../services/queryClient";
 import { useViewportSize } from "@mantine/hooks";
 import { MoonStars, Sun } from "tabler-icons-react";
 import Logo, { LogoDark } from "../components/Logo";
+import { Hydrate } from "react-query";
 
 if (typeof window !== "undefined") {
   SuperTokensReact.init(SuperTokensConfig.frontendConfig());
@@ -171,7 +172,9 @@ function App(props: AppProps & { colorScheme: ColorScheme }) {
                       ) : undefined
                     }
                   >
-                    <Component {...pageProps} />
+                    <Hydrate state={pageProps.dehydratedState}>
+                      <Component {...pageProps} />
+                    </Hydrate>
                   </AppShell>
                 </ThirdPartyEmailPasswordAuthNoSSR>
               )}

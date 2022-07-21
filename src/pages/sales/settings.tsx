@@ -48,37 +48,51 @@ interface SettingProps {
   bot_token: string;
   drive_folder: string;
   maintenance: string;
+  filename: string;
   mapping: any;
   exclude_summary: string[];
   exclude_edit: string[];
+  group_order: string[];
+  key_order: string[];
+  folders: string[];
 }
 
 export default function Bot() {
   const { accessTokenPayload } = useSessionContext();
   const [drives, setDrives] = useState<DriveProps[]>([]);
   const [fields, setFields] = useState([""]);
+  const [data, setData] = useState<SettingProps>();
+  const [keyData, setKeyData] = useState<string[]>([]);
   const [selected, setSelected] = useState("drive");
   const form = useForm({
     initialValues: {
       folder: "",
       token: "",
       maintenance: "",
+      filename: "",
       mapping: formList([{ source: "", destination: "" }]),
       exclude_summary: [""],
       exclude_edit: [""],
+      group_order: [""],
+      key_order: [""],
     },
   });
 
   useEffect(() => {
     api.get<SettingProps>("/api/sales/settings").then((res) => {
+      setData(res.data);
+      setKeyData(res.data.key_order);
       setFields([...res.data.exclude_summary, ...res.data.exclude_edit]);
       form.setValues({
         folder: res.data.drive_folder,
         token: res.data.bot_token,
+        filename: res.data.filename,
         maintenance: res.data.maintenance,
         mapping: formList(res.data.mapping),
         exclude_summary: res.data.exclude_summary,
         exclude_edit: res.data.exclude_edit,
+        group_order: res.data.group_order,
+        key_order: res.data.key_order,
       });
     });
   }, []);
@@ -162,7 +176,6 @@ export default function Bot() {
         form.values
       )
       .then((res) => {
-        console.log(res.data);
         if (res.data.ok) {
           const r = res.data.result;
           return showNotification({
@@ -204,6 +217,21 @@ export default function Bot() {
     api.post("api/key", { key: "BOT_MAINTENANCE", value: newState });
   };
 
+  const handleSubmitDrive = () => {
+    api
+      .post("/api/sales/settings", {
+        folder: form.values.folder,
+        filename: form.values.filename,
+      })
+      .then((res) => {
+        showNotification({
+          title: "Salvo com sucesso",
+          message: "Configurações salvas",
+          color: "green",
+        });
+      });
+  };
+
   const handleSubmitSync = () => {
     api
       .post("/api/sales/settings", { mapping: form.values.mapping })
@@ -221,6 +249,8 @@ export default function Bot() {
       .put("/api/sales/flow/1", {
         exclude_edit: form.values.exclude_edit,
         exclude_summary: form.values.exclude_summary,
+        key_order: form.values.key_order,
+        group_order: form.values.group_order,
       })
       .then((res) => {
         showNotification({
@@ -324,6 +354,16 @@ export default function Bot() {
             sx={{ maxWidth: 300 }}
             {...form.getInputProps("folder")}
           />
+          <TextInput
+            label="Nome do arquivo"
+            description="Variáveis: NOME, TIPO, DATA, DOCUMENTO"
+            sx={{ maxWidth: 400 }}
+            mt={10}
+            {...form.getInputProps("filename")}
+          />
+          <Button color="green" mt={20} onClick={handleSubmitDrive}>
+            Salvar
+          </Button>
         </Box>
       )}
       {selected == "contract" && (
@@ -414,11 +454,12 @@ export default function Bot() {
                 : "Manutenção"}
             </Button>
           </Group>
+          <Divider mt={20} label="Resumo" />
           <MultiSelect
-            label="Excluir campos resumo"
+            label="Ocultar campos e edição"
             data={fields}
             sx={{ maxWidth: 480 }}
-            mt={20}
+            mt={10}
             {...form.getInputProps("exclude_summary")}
             searchable
             creatable
@@ -426,7 +467,7 @@ export default function Bot() {
             onCreate={(query) => setFields((current) => [...current, query])}
           />
           <MultiSelect
-            label="Excluir campos edição"
+            label="Ocultar edição"
             data={fields}
             sx={{ maxWidth: 480 }}
             mt={10}
@@ -435,6 +476,26 @@ export default function Bot() {
             creatable
             getCreateLabel={(query) => `+ ${query}`}
             onCreate={(query) => setFields((current) => [...current, query])}
+          />
+          <Divider mt={20} label="Ordenação" />
+          <MultiSelect
+            label="Grupo"
+            data={data?.folders || []}
+            sx={{ maxWidth: 480 }}
+            mt={10}
+            {...form.getInputProps("group_order")}
+            searchable
+          />
+          <MultiSelect
+            label="Item"
+            data={keyData}
+            sx={{ maxWidth: 480 }}
+            mt={10}
+            {...form.getInputProps("key_order")}
+            searchable
+            creatable
+            getCreateLabel={(query) => `+ ${query}`}
+            onCreate={(query) => setKeyData((current) => [...current, query])}
           />
           <Button mt={20} onClick={handleSubmitBot}>
             Salvar

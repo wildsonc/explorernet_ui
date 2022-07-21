@@ -124,7 +124,7 @@ export default function UsersTable() {
       </Center>
     );
   }
-  if (!sortedData) return <></>;
+  if (!sortedData) setSortedData(data);
   if (!groups) return <></>;
 
   const roles = accessTokenPayload.roles;
@@ -215,7 +215,7 @@ export default function UsersTable() {
     setSortedData(filterData(data, value));
   };
 
-  const rows = sortedData.map((item) => (
+  const rows = sortedData?.map((item) => (
     <tr key={item.id}>
       <td>
         <Group spacing="sm">

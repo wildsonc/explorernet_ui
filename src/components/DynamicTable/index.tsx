@@ -11,7 +11,9 @@ export function DynamicTable({ elements }: any) {
     let row = [];
     let i = 1;
     for (let key in value) {
-      row.push(<td key={i}>{value[key].toString().replace(",", ", ")}</td>);
+      row.push(
+        <td key={i}>{(value[key] || "").toString().replace(",", ", ")}</td>
+      );
       i++;
     }
     rows.push(<tr key={value.phone}>{row}</tr>);

@@ -23,6 +23,7 @@ import TemplateIcon from "../../components/Icons/ApiTemplateIcon";
 import UnicoIcon from "../../components/Icons/UnicoIcon";
 import SpcIcon from "../../components/Icons/SpcIcon";
 import GoogleMapsIcon from "../../components/Icons/GoogleMapsIcon";
+import FlowbixIcon from "../../components/Icons/FlowbixIcon";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -258,6 +259,17 @@ export default function ActionsGrid() {
           <AutoSaveTextInput label="URL" name="MK_API_URL" />
           <AutoSaveTextInput label="Token" name="MK_API_TOKEN" />
           <AutoSaveTextInput label="Password" name="MK_API_PASSWORD" />
+        </>
+      ),
+    },
+    {
+      title: "Flowbix",
+      icon: FlowbixIcon,
+      color: "blue",
+      children: (
+        <>
+          <AutoSaveTextInput label="URL" name="FLOWBIX_URL" />
+          <AutoSaveTextInput label="Token" name="FLOWBIX_TOKEN" />
         </>
       ),
     },

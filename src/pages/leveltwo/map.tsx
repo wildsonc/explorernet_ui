@@ -202,7 +202,6 @@ function Docs() {
       longitude,
       latitude,
     };
-    console.log(payload);
     api.post("api/leveltwo/cto", payload).then((res) => {
       if (res.status == 200) {
         showNotification({

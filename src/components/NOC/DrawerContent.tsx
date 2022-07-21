@@ -20,10 +20,16 @@ interface Props {
 }
 
 export default function DrawerContent({ mapRef }: any) {
-  const { data } = useQuery<Props[], Error>("noc-history", async () => {
-    const response = await api.get(`api/noc/history`);
-    return response.data;
-  });
+  const { data } = useQuery<Props[], Error>(
+    "noc-history",
+    async () => {
+      const response = await api.get(`api/noc/history`);
+      return response.data;
+    },
+    {
+      staleTime: 1000 * 5,
+    }
+  );
 
   if (!data) return null;
 

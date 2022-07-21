@@ -96,7 +96,7 @@ export default function Franchise() {
       </Center>
     );
   }
-  if (!sortedData) return <></>;
+  if (!sortedData) setSortedData(data);
 
   const roles = accessTokenPayload.roles;
 
@@ -175,7 +175,7 @@ export default function Franchise() {
     setSortedData(filterData(data, value));
   };
 
-  const rows = sortedData.map((item) => (
+  const rows = sortedData?.map((item) => (
     <tr key={item.id}>
       <td>
         <Group spacing="sm" noWrap>
@@ -250,7 +250,6 @@ export default function Franchise() {
       </td>
     </tr>
   ));
-
   return (
     <>
       <Group position="apart" noWrap>

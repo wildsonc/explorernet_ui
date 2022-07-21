@@ -15,10 +15,16 @@ interface Props {
 }
 
 export default function DrawerActiveContent({ mapRef }: any) {
-  const { data } = useQuery<Props[], Error>("noc-notifications", async () => {
-    const response = await api.get(`api/noc/notification`);
-    return response.data;
-  });
+  const { data } = useQuery<Props[], Error>(
+    "noc-notifications",
+    async () => {
+      const response = await api.get(`api/noc/notification`);
+      return response.data;
+    },
+    {
+      staleTime: 1000 * 5,
+    }
+  );
 
   if (!data) return null;
 

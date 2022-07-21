@@ -6,10 +6,10 @@ import {
   Loader,
   Modal,
   ScrollArea,
+  Select,
   Table,
   Text,
   TextInput,
-  useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";
@@ -20,34 +20,38 @@ import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { Pencil, Plus, Search, Trash } from "tabler-icons-react";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
+import { formatDate } from "../../services/utils/formatDate";
 import hasPermission from "../../services/utils/hasPermission";
 
-interface CityProps {
+interface OltProps {
   id: number;
   name: string;
-  state: string;
-  is_active: boolean;
+  ip: string;
+  olt_type: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export default function Cities() {
+export default function Olt() {
   const modals = useModals();
   const [opened, setOpened] = useState(false);
-  const [city, setCity] = useState<CityProps>();
+  const [olt, setOlt] = useState<OltProps>();
   const [search, setSearch] = useState("");
-  const [sortedData, setSortedData] = useState<CityProps[]>();
+  const [sortedData, setSortedData] = useState<OltProps[]>();
   const { accessTokenPayload } = useSessionContext();
 
   const form = useForm({
     initialValues: {
       name: "",
-      state: "",
+      ip: "",
+      olt_type: "",
     },
   });
 
-  const { data, refetch } = useQuery<CityProps[], Error>(
-    "cities",
+  const { data, refetch } = useQuery<OltProps[], Error>(
+    "olts",
     async () => {
-      const response = await api.get(`api/city`);
+      const response = await api.get(`api/leveltwo/olt`);
       setSortedData(response.data);
       return response.data;
     },
@@ -71,23 +75,32 @@ export default function Cities() {
     return <NotAuthorized />;
   }
 
+  const types = [
+    "huawei",
+    "fiberhome",
+    "zte",
+    "datacom",
+    "vsolutions",
+    "nokia",
+  ];
+
   const handleSubmit = (values: typeof form.values) => {
-    if (city) {
-      api.put(`api/city/${city?.id}`, values).then(() => {
+    if (olt) {
+      api.put(`api/leveltwo/olt/${olt?.id}`, values).then(() => {
         setOpened(false);
         refetch();
         showNotification({
           title: "Atualizado",
-          message: city?.name,
+          message: olt?.name,
           color: "green",
         });
       });
     } else {
-      api.post(`api/city`, values).then(() => {
+      api.post(`api/leveltwo/olt`, values).then(() => {
         setOpened(false);
         refetch();
         showNotification({
-          title: "Nova cidade",
+          title: "Nova olt",
           message: values.name,
           color: "blue",
         });
@@ -95,31 +108,30 @@ export default function Cities() {
     }
   };
 
-  const edit = (city: CityProps) => {
-    form.setValues({ name: city.name, state: city.state });
-    setCity(city);
+  const edit = (olt: OltProps) => {
+    form.setValues({ name: olt.name, ip: olt.ip, olt_type: olt.olt_type });
+    setOlt(olt);
     setOpened(true);
   };
 
-  const openDeleteModal = (city: CityProps) => {
+  const openDeleteModal = (olt: OltProps) => {
     modals.openConfirmModal({
-      title: <strong>Excluir cidade</strong>,
+      title: <strong>Excluir OLT</strong>,
       centered: true,
       children: (
         <Text size="sm">
-          Você tem certeza que deseja excluir a cidade{" "}
-          <strong>{city.name}</strong>?
+          Você tem certeza que deseja excluir a OLT <strong>{olt.name}</strong>?
         </Text>
       ),
       labels: { confirm: "Excluir", cancel: "Cancelar" },
       confirmProps: { color: "red" },
       onConfirm: () => {
-        api.delete(`api/city/${city.id}`).then(() => {
+        api.delete(`api/leveltwo/olt/${olt.id}`).then(() => {
           setOpened(false);
           refetch();
           showNotification({
-            title: "Cidade excluída",
-            message: city.name,
+            title: "OLT excluída",
+            message: olt.name,
             color: "red",
           });
         });
@@ -127,8 +139,8 @@ export default function Cities() {
     });
   };
 
-  function filterData(data: CityProps[], search: string) {
-    const keys = ["name"];
+  function filterData(data: OltProps[], search: string) {
+    const keys = ["name", "ip", "olt_type"];
     const query = search.toLowerCase().trim();
     return data.filter((item) =>
       keys.some((key) => (item as any)[key]?.toLowerCase().includes(query))
@@ -144,7 +156,10 @@ export default function Cities() {
   const rows = sortedData?.map((item) => (
     <tr key={item.id}>
       <td>{item.name}</td>
-      <td>{item.state}</td>
+      <td>{item.ip}</td>
+      <td>{item.olt_type}</td>
+      <td>{formatDate(item.created_at)}</td>
+      <td>{formatDate(item.updated_at)}</td>
       <td>
         <Group spacing={0} position="right">
           <ActionIcon
@@ -178,12 +193,12 @@ export default function Cities() {
           sx={{ width: 150 }}
           onClick={() => {
             form.reset();
-            setCity(undefined);
+            setOlt(undefined);
             setOpened(true);
           }}
           leftIcon={<Plus size={18} />}
         >
-          Cidade
+          OLT
         </Button>
       </Group>
       <ScrollArea sx={{ height: "calc(100vh - 90px)" }} offsetScrollbars>
@@ -191,7 +206,10 @@ export default function Cities() {
           <thead>
             <tr>
               <th>Nome</th>
-              <th>UF</th>
+              <th>IP</th>
+              <th>Tipo</th>
+              <th>Criado</th>
+              <th>Atualizado</th>
               <th />
             </tr>
           </thead>
@@ -200,12 +218,18 @@ export default function Cities() {
         <Modal
           opened={opened}
           onClose={() => setOpened(false)}
-          title={city?.name}
+          title={olt?.name}
           withCloseButton={false}
         >
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <TextInput label="Nome" {...form.getInputProps("name")} />
-            <TextInput label="UF" {...form.getInputProps("state")} />
+            <TextInput label="IP" {...form.getInputProps("ip")} />
+            <Select
+              data={types}
+              searchable
+              label="Tipo"
+              {...form.getInputProps("olt_type")}
+            />
             <Group position="right" sx={{ marginTop: 20 }}>
               <Button color="gray" onClick={() => setOpened(false)}>
                 Cancelar

@@ -110,7 +110,7 @@ export default function Products() {
       </Center>
     );
   }
-  if (!sortedData) return <></>;
+  if (!sortedData) setSortedData(data);
 
   const roles = accessTokenPayload.roles;
 
@@ -188,7 +188,7 @@ export default function Products() {
     setSortedData(filterData(data, value));
   };
 
-  const rows = sortedData.map((item) => (
+  const rows = sortedData?.map((item) => (
     <tr key={item.id}>
       <td>
         <Group spacing="sm" noWrap>

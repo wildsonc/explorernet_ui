@@ -175,6 +175,18 @@ export const listItems = [
         role: "view_support2",
         description: "NVL2 → Documentação",
       },
+      {
+        label: "Atualizar OLT",
+        link: "/leveltwo/update-olt",
+        role: "view_support2",
+        description: "NVL2 → Atualizar OLT",
+      },
+      {
+        label: "OLTs",
+        link: "/leveltwo/olt",
+        role: "admin",
+        description: "NVL2 → OLTs",
+      },
     ],
   },
   {

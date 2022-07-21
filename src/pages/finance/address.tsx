@@ -78,7 +78,6 @@ const ChangeAddress = () => {
   const handleSubmitSearch = async (values: typeof searchForm.values) => {
     setIsLoading(true);
     const response = await api.post("api/finance/customer", values);
-    console.log(response);
     if (response.data.status == "Not Found") {
       setData(undefined);
       showNotification({

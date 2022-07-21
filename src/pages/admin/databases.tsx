@@ -209,7 +209,6 @@ function Database() {
 
   const testConnection = async (values: any) => {
     const response = await api.post(`api/database-test`, values);
-    console.log(response.data);
     if (response.data.status == "Error") {
       showNotification({
         title: "Falhou",

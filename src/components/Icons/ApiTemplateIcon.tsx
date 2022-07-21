@@ -7,7 +7,7 @@ function Icon() {
       version="1.1"
       viewBox="0 -40 150 200"
       width="50"
-      height="50"
+      height="40"
     >
       <image
         width="150"
