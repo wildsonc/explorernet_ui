@@ -111,7 +111,7 @@ export default function Mapa() {
       return response.data;
     },
     {
-      staleTime: 1000 * 10, // 1 minute
+      staleTime: 1000 * 10,
     }
   );
 

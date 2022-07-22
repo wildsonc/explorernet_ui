@@ -18,9 +18,14 @@ interface OltProps {
   updated_at: string;
 }
 
+interface Props {
+  value: string;
+  label: string;
+}
+
 const UpdateOlt = () => {
   let { accessTokenPayload } = useSessionContext();
-  const [olts, setOlts] = useState([]);
+  const [olts, setOlts] = useState<Props[]>();
   const [loading, setLoading] = useState(false);
   const form = useForm({
     initialValues: {
@@ -37,13 +42,14 @@ const UpdateOlt = () => {
     "olts",
     async () => {
       const res = await api.get(`api/leveltwo/olt`);
-      setOlts(res.data.map((e: OltProps) => ({ label: e.name, value: e.ip })));
       return res.data;
     },
     {
       staleTime: 1000 * 60,
     }
   );
+
+  if (!olts && data) setOlts(data.map((e) => ({ label: e.name, value: e.ip })));
 
   const roles = accessTokenPayload.roles;
 
@@ -71,7 +77,7 @@ const UpdateOlt = () => {
         <div>
           <Select
             label="OLT"
-            data={olts}
+            data={olts || []}
             searchable
             required
             {...form.getInputProps("ip")}

@@ -52,7 +52,6 @@ export default function Olt() {
     "olts",
     async () => {
       const response = await api.get(`api/leveltwo/olt`);
-      setSortedData(response.data);
       return response.data;
     },
     {

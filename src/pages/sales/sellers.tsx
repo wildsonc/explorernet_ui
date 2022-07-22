@@ -79,7 +79,6 @@ export default function Seller() {
     "sellers",
     async () => {
       const response = await api.get(`api/sales/seller`);
-      setSortedData(response.data);
       return response.data;
     },
     {

@@ -31,6 +31,7 @@ import {
   Trash,
   Plus,
   Folder,
+  Tool,
 } from "tabler-icons-react";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
@@ -39,6 +40,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { showNotification } from "@mantine/notifications";
 import { steps } from "../../services/steps";
 import { useModals } from "@mantine/modals";
+import { useLeavePageConfirm } from "../../services/hooks/useLeavePageConfirm";
 
 const useStyles = createStyles((theme, _settings, getRef) => ({
   icon: { ref: getRef("icon") },
@@ -86,6 +88,9 @@ export default function Flow() {
   const { accessTokenPayload } = useSessionContext();
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [openedSetting, setOpenedSetting] = useState(false);
+  const [settings, setSettings] = useState([]);
+  const [edited, setEdited] = useState(false);
   const [openedNode, setOpenedNode] = useState(false);
   const [folderData, setFolderData] = useState([
     "Outros",
@@ -101,6 +106,16 @@ export default function Flow() {
       steps: formList(steps),
     },
   });
+  const formSettings = useForm({
+    initialValues: {
+      indexNode: 0,
+      index: 0,
+      conditions: formList([{ key: "", op: "", value: "" }]),
+    },
+  });
+
+  useLeavePageConfirm(edited);
+  useEffect(() => setEdited(true), [form.values]);
 
   const roles = accessTokenPayload.roles;
 
@@ -109,8 +124,14 @@ export default function Flow() {
       const data = res.data["steps"];
       setFolderData(res.data["folders"]);
       form.setValues({ loading: false, key: "", steps: formList(data) });
+      setEdited(false);
     });
   }, []);
+
+  useEffect(() => {
+    // @ts-ignore
+    return setSettings(formSettings.values?.conditions);
+  }, [formSettings.values]);
 
   if (!hasPermission("admin", roles)) {
     return <NotAuthorized />;
@@ -201,6 +222,8 @@ export default function Flow() {
           value: "",
           type: "custom",
           label: "",
+          buttons: [],
+          conditions: [],
         });
       }
     });
@@ -245,6 +268,7 @@ export default function Flow() {
     let steps = form.values.steps;
     steps.map((_, index) => {
       if (index == nodeIndex) {
+        // @ts-ignore
         _.messages = _.messages?.filter((e, i) => i != questionIndex);
       }
     });
@@ -359,7 +383,17 @@ export default function Flow() {
                               {e.label} <Code>{e.key}</Code>
                             </>
                           ) : (
-                            <Code color="indigo">{e.key}</Code>
+                            <Group>
+                              <Code color="indigo">{e.key}</Code>
+                              {e.type == "custom" ? (
+                                <ActionIcon
+                                  color="blue"
+                                  onClick={() => openSetting(index, i)}
+                                >
+                                  <Tool size={14} />
+                                </ActionIcon>
+                              ) : null}
+                            </Group>
                           )
                         }
                         value={e.value}
@@ -489,6 +523,7 @@ export default function Flow() {
           icon: <Check />,
         });
         setLoading(false);
+        setEdited(false);
       });
   };
 
@@ -499,6 +534,30 @@ export default function Flow() {
       </Center>
     );
   }
+
+  const openSetting = (indexNode: number, index: number) => {
+    const data = form.values.steps[indexNode].messages[index].conditions || [];
+    formSettings.setValues({ conditions: formList(data), indexNode, index });
+    setOpenedSetting(true);
+  };
+
+  const saveSetting = () => {
+    const values = formSettings.values.conditions;
+    const indexNode = formSettings.values.indexNode;
+    const indexMessage = formSettings.values.index;
+    let steps = form.values.steps;
+    steps.map((_, index) => {
+      if (index == indexNode) {
+        _.messages?.map((e, i) => {
+          if (i == indexMessage) {
+            e.conditions = values;
+          }
+        });
+      }
+    });
+    form.setFieldValue("steps", steps);
+    setOpenedSetting(false);
+  };
 
   return (
     <>
@@ -575,6 +634,68 @@ export default function Flow() {
             Cancelar
           </Button>
           <Button onClick={addNode}>Adicionar</Button>
+        </Group>
+      </Modal>
+      <Modal
+        title="Condição"
+        opened={openedSetting}
+        centered
+        size="lg"
+        onClose={() => setOpenedSetting(false)}
+      >
+        {formSettings.values?.conditions.map((item, index) => (
+          <Group key={index} mt="xs">
+            <TextInput
+              placeholder="Key"
+              required
+              sx={{ flex: 1 }}
+              {...formSettings.getListInputProps("conditions", index, "key")}
+            />
+            <Select
+              data={[
+                "=",
+                "!=",
+                ">",
+                "<",
+                "Existe",
+                "Não existe",
+                "Contém",
+                "Não contém",
+              ]}
+              required
+              sx={{ flex: 0.7 }}
+              {...formSettings.getListInputProps("conditions", index, "op")}
+            />
+            <TextInput
+              placeholder="Valor"
+              required
+              sx={{ flex: 1 }}
+              {...formSettings.getListInputProps("conditions", index, "value")}
+            />
+            <ActionIcon
+              color="red"
+              variant="hover"
+              onClick={() => formSettings.removeListItem("conditions", index)}
+            >
+              <Trash size={16} />
+            </ActionIcon>
+          </Group>
+        ))}
+        <Group position="center" mt="md">
+          <Button
+            onClick={() =>
+              formSettings.addListItem("conditions", {
+                key: "",
+                op: "",
+                value: "",
+              })
+            }
+          >
+            + Condição
+          </Button>
+          <Button color="green" onClick={saveSetting}>
+            Salvar
+          </Button>
         </Group>
       </Modal>
     </>

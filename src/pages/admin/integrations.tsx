@@ -160,6 +160,11 @@ export default function ActionsGrid() {
       children: (
         <>
           <AutoSaveTextInput label="Token" name="SPC_TOKEN" />
+          <AutoSaveTextInput
+            label="Tempo no histórico (Dias)"
+            name="SPC_DAYS"
+            type="number"
+          />
         </>
       ),
     },
@@ -205,6 +210,10 @@ export default function ActionsGrid() {
           <AutoSaveTextInput label="API KEY" name="UNICO_API_KEY" />
           <AutoSaveTextInput label="Auth URL" name="UNICO_AUTH_URL" />
           <AutoSaveTextInput label="API URL" name="UNICO_API_URL" />
+          <AutoSaveTextInput
+            label="Template WhatsApp"
+            name="UNICO_TEMPLATE_WHATSAPP"
+          />
         </>
       ),
     },

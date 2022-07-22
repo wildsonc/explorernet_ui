@@ -86,7 +86,6 @@ export default function Products() {
     "products",
     async () => {
       const response = await api.get(`api/sales/product`);
-      setSortedData(response.data);
       return response.data;
     },
     {

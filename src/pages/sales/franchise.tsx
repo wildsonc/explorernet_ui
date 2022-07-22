@@ -73,7 +73,6 @@ export default function Franchise() {
     "franchises",
     async () => {
       const response = await api.get(`api/sales/franchise`);
-      setSortedData(response.data);
       return response.data;
     },
     {

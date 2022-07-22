@@ -368,13 +368,25 @@ export default function Bot() {
       )}
       {selected == "contract" && (
         <Box mt={10}>
+          <Divider label="Fluxo UNICO" />
           <AutoSaveTextInput
-            label="Template Adesão"
+            label="Explorernet"
+            name="UNICO_FLUXO_EXPLORERNET"
+            sx={{ maxWidth: 300 }}
+          />
+          <AutoSaveTextInput
+            label="Internetup"
+            name="UNICO_FLUXO_INTERNETUP"
+            sx={{ maxWidth: 300 }}
+          />
+          <Divider label="Templates" mt={20} />
+          <AutoSaveTextInput
+            label="Adesão"
             name="BOT_TEMPLATE_ADESAO"
             sx={{ maxWidth: 300 }}
           />
           <AutoSaveTextInput
-            label="Template Adesão PJ"
+            label="Adesão PJ"
             name="BOT_TEMPLATE_ADESAO_PJ"
             sx={{ maxWidth: 300 }}
           />

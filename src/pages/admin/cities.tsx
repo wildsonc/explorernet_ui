@@ -48,7 +48,6 @@ export default function Cities() {
     "cities",
     async () => {
       const response = await api.get(`api/city`);
-      setSortedData(response.data);
       return response.data;
     },
     {

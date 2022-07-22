@@ -109,7 +109,6 @@ export default function UsersTable() {
     "users",
     async () => {
       const response = await api.get(`api/users`);
-      setSortedData(response.data);
       return response.data;
     },
     {
