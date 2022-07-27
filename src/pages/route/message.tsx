@@ -168,7 +168,7 @@ const SendMessage = () => {
     if (res.data.status === "error") {
       showNotification({
         title: res.data.message.title,
-        message: res.data.message.details,
+        message: res.data.message,
         color: "red",
         autoClose: 1000 * 20,
       });

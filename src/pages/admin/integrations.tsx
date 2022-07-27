@@ -24,6 +24,7 @@ import UnicoIcon from "../../components/Icons/UnicoIcon";
 import SpcIcon from "../../components/Icons/SpcIcon";
 import GoogleMapsIcon from "../../components/Icons/GoogleMapsIcon";
 import FlowbixIcon from "../../components/Icons/FlowbixIcon";
+import AutoSaveSwitch from "../../components/AutoSave/AutoSaveSwitch";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -160,11 +161,13 @@ export default function ActionsGrid() {
       children: (
         <>
           <AutoSaveTextInput label="Token" name="SPC_TOKEN" />
+          <AutoSaveTextInput label="Token Homologação" name="SPC_TOKEN_HML" />
           <AutoSaveTextInput
             label="Tempo no histórico (Dias)"
             name="SPC_DAYS"
             type="number"
           />
+          <AutoSaveSwitch label="Homologação" name="SPC_HOMOLOGATION" my={10} />
         </>
       ),
     },

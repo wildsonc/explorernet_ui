@@ -31,6 +31,7 @@ interface Customer {
   connection: number;
   full_name: string;
   document: string;
+  is_cnpj: boolean;
   city: string;
   district: string;
   street: string;
@@ -75,8 +76,16 @@ const ChangePlan = () => {
     initialValues: {
       price: 0.0,
       access_plan: "",
+      cpf: "",
+      socio: "",
       fix_ip: false,
       change_owner: false,
+    },
+    validate: {
+      socio: (value) =>
+        data?.customer?.is_cnpj == true && value == "" ? "Obrigatório" : null,
+      cpf: (value) =>
+        data?.customer?.is_cnpj == true && value == "" ? "Obrigatório" : null,
     },
   });
 
@@ -229,6 +238,22 @@ const ChangePlan = () => {
               disabled
             />
           </Group>
+          {data?.customer?.is_cnpj && (
+            <>
+              <TextInput
+                label="Sócio"
+                sx={{ maxWidth: 400 }}
+                {...form.getInputProps("socio")}
+                required
+              />
+              <TextInput
+                label="CPF Sócio"
+                sx={{ maxWidth: 400 }}
+                {...form.getInputProps("cpf")}
+                required
+              />
+            </>
+          )}
           <Button
             mt={20}
             type="submit"

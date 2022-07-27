@@ -103,7 +103,7 @@ function Query() {
   const { classes } = useStyles();
   const [query, setQuery] = useState(``);
   const [queryResult, setQueryResult] = useState("");
-  const [databases, setDatabases] = useState();
+  const [databases, setDatabases] = useState([]);
   const [companies, setCompanies] = useState();
   const [valid, setValid] = useState(false);
   const [openTest, setOpenTest] = useState(false);
@@ -125,16 +125,16 @@ function Query() {
     return response.data;
   });
   const { id } = router.query;
-  const current_values = data?.filter((e) => String(e.id) == id)[0];
 
   useEffect(() => {
-    if (current_values) {
-      setQuery(current_values.code);
-      form.setFieldValue("database", current_values.database);
-      form.setFieldValue("template", current_values.template);
-      form.setFieldValue("name", current_values.name);
+    if (data) {
+      const v = data?.filter((e) => String(e.id) == id)[0];
+      setQuery(v.code);
+      form.setFieldValue("database", v.database);
+      form.setFieldValue("template", v.template);
+      form.setFieldValue("name", v.name);
     }
-  }, [current_values]);
+  }, [data]);
 
   useEffect(() => {
     const get = async () => {
@@ -164,8 +164,6 @@ function Query() {
   useMemo(() => {
     form.setFieldValue("code", query);
   }, [query]);
-
-  if (!current_values) return <></>;
 
   const roles = accessTokenPayload.roles;
   if (!hasPermission("admin", roles)) {
@@ -277,7 +275,7 @@ function Query() {
             <Group>
               <Select
                 style={{ zIndex: 2 }}
-                data={databases ? databases : [""]}
+                data={databases}
                 placeholder="Selecione..."
                 label="Banco de dados"
                 classNames={classes}

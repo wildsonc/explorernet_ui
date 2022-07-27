@@ -249,7 +249,7 @@ export default function Flow() {
 
   const addNode = () => {
     form.addListItem("steps", {
-      func: "__generic_node",
+      func: "generic_node",
       label: form.values.key,
       active: true,
       folder: "",
