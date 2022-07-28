@@ -102,6 +102,10 @@ export default function Products() {
     });
   }, []);
 
+  useEffect(() => {
+    if (data) setSortedData(data);
+  }, [data]);
+
   if (!data) {
     return (
       <Center>
@@ -109,7 +113,6 @@ export default function Products() {
       </Center>
     );
   }
-  if (!sortedData) setSortedData(data);
 
   const roles = accessTokenPayload.roles;
 

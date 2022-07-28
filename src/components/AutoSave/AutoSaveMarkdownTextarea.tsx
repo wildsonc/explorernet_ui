@@ -112,13 +112,16 @@ function AutoSaveMarkdownTextarea(props: Props) {
               <Center mr={-10}>
                 <Eye size={16} />
               </Center>
-              <Text size="sm" weight={500} mb={4}>
+              <Text size="sm" weight={500} mb={4} color="dimmed">
                 Preview
               </Text>
             </Group>
           )}
           <ReactMarkdown className={classes.markdown}>
-            {currentValue.replaceAll("*", "**").replaceAll("-", "\\-")}
+            {currentValue
+              .replaceAll("*", "**")
+              .replaceAll("-", "\\-")
+              .replaceAll(/\n/gi, "\n &nbsp;")}
           </ReactMarkdown>
         </Box>
       )}

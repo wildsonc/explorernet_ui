@@ -9,12 +9,11 @@ import {
   Table,
   Text,
   TextInput,
-  useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { Pencil, Plus, Search, Trash } from "tabler-icons-react";
@@ -55,6 +54,10 @@ export default function Cities() {
     }
   );
 
+  useEffect(() => {
+    if (data) setSortedData(data);
+  }, [data]);
+
   if (!data) {
     return (
       <Center>
@@ -62,7 +65,6 @@ export default function Cities() {
       </Center>
     );
   }
-  if (!sortedData) setSortedData(data);
 
   const roles = accessTokenPayload.roles;
 

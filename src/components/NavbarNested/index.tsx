@@ -5,9 +5,10 @@ import {
   ScrollArea,
   useMantineColorScheme,
 } from "@mantine/core";
+import { useViewportSize } from "@mantine/hooks";
 import { SpotlightAction, SpotlightProvider } from "@mantine/spotlight";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { Home, MoonStars, Search, Sun } from "tabler-icons-react";
 import api from "../../services/api";
@@ -15,9 +16,8 @@ import hasPermission from "../../services/utils/hasPermission";
 import Logo, { LogoDark } from "../Logo";
 import { ActionLink, LinksGroup } from "../NavbarLinksGroup";
 import { UserButton } from "../UserButton";
-import { useStyles } from "./styles";
 import { listItems } from "./listItems";
-import { useViewportSize } from "@mantine/hooks";
+import { useStyles } from "./styles";
 
 interface Props {
   opened: boolean;

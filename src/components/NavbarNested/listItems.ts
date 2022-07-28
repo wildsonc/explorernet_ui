@@ -244,6 +244,12 @@ export const listItems = [
         role: "admin",
         description: "Whatsapp → Empresas",
       },
+      {
+        label: "Blacklist",
+        link: "/whatsapp/blacklist",
+        role: "admin",
+        description: "Whatsapp → Blacklist",
+      },
     ],
   },
   {

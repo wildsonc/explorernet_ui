@@ -1,15 +1,18 @@
 import {
   ActionIcon,
+  Avatar,
+  Badge,
   Button,
   Center,
   Group,
   Loader,
   Modal,
+  MultiSelect,
   ScrollArea,
-  Select,
   Table,
   Text,
   TextInput,
+  Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";
@@ -17,41 +20,34 @@ import { showNotification } from "@mantine/notifications";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
-import { Pencil, Plus, Search, Trash } from "tabler-icons-react";
+import { Building, Pencil, Plus, Search, Trash } from "tabler-icons-react";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
-import { formatDate } from "../../services/utils/formatDate";
 import hasPermission from "../../services/utils/hasPermission";
 
-interface OltProps {
+interface Props {
   id: number;
-  name: string;
-  ip: string;
-  olt_type: string;
-  created_at: string;
-  updated_at: string;
+  phone: string;
 }
 
-export default function Olt() {
+export default function Franchise() {
   const modals = useModals();
   const [opened, setOpened] = useState(false);
-  const [olt, setOlt] = useState<OltProps>();
   const [search, setSearch] = useState("");
-  const [sortedData, setSortedData] = useState<OltProps[]>();
+  const [phone, setPhone] = useState<Props>();
+  const [sortedData, setSortedData] = useState<Props[]>();
   const { accessTokenPayload } = useSessionContext();
 
   const form = useForm({
     initialValues: {
-      name: "",
-      ip: "",
-      olt_type: "",
+      phone: "",
     },
   });
 
-  const { data, refetch } = useQuery<OltProps[], Error>(
-    "olts",
+  const { data, refetch } = useQuery<Props[], Error>(
+    "blacklist",
     async () => {
-      const response = await api.get(`api/leveltwo/olt`);
+      const response = await api.get(`api/whatsapp/blacklist`);
       return response.data;
     },
     {
@@ -77,63 +73,51 @@ export default function Olt() {
     return <NotAuthorized />;
   }
 
-  const types = [
-    "huawei",
-    "fiberhome",
-    "zte",
-    "datacom",
-    "vsolutions",
-    "nokia",
-  ];
-
   const handleSubmit = (values: typeof form.values) => {
-    if (olt) {
-      api.put(`api/leveltwo/olt/${olt?.id}`, values).then(() => {
+    if (phone) {
+      api.put(`api/whatsapp/blacklist/${phone.id}`, values).then(() => {
         setOpened(false);
         refetch();
         showNotification({
           title: "Atualizado",
-          message: olt?.name,
+          message: values.phone,
           color: "green",
         });
       });
     } else {
-      api.post(`api/leveltwo/olt`, values).then(() => {
+      api.post(`api/whatsapp/blacklist`, values).then(() => {
         setOpened(false);
         refetch();
-        showNotification({
-          title: "Nova olt",
-          message: values.name,
-          color: "blue",
-        });
       });
     }
   };
 
-  const edit = (olt: OltProps) => {
-    form.setValues({ name: olt.name, ip: olt.ip, olt_type: olt.olt_type });
-    setOlt(olt);
+  const edit = (p: Props) => {
+    setPhone(p);
     setOpened(true);
+    form.setValues({
+      phone: p.phone,
+    });
   };
 
-  const openDeleteModal = (olt: OltProps) => {
+  const openDeleteModal = (p: Props) => {
     modals.openConfirmModal({
-      title: <strong>Excluir OLT</strong>,
+      title: "Remover da blacklist",
       centered: true,
       children: (
         <Text size="sm">
-          Você tem certeza que deseja excluir a OLT <strong>{olt.name}</strong>?
+          Você tem certeza que deseja remover o telefone{" "}
+          <strong>{p.phone}</strong>?
         </Text>
       ),
       labels: { confirm: "Excluir", cancel: "Cancelar" },
       confirmProps: { color: "red" },
       onConfirm: () => {
-        api.delete(`api/leveltwo/olt/${olt.id}`).then(() => {
-          setOpened(false);
+        api.delete(`api/whatsapp/blacklist/${p.id}`).then(() => {
           refetch();
           showNotification({
-            title: "OLT excluída",
-            message: olt.name,
+            title: "Removido",
+            message: p.phone,
             color: "red",
           });
         });
@@ -141,8 +125,8 @@ export default function Olt() {
     });
   };
 
-  function filterData(data: OltProps[], search: string) {
-    const keys = ["name", "ip", "olt_type"];
+  function filterData(data: Props[], search: string) {
+    const keys = ["phone"];
     const query = search.toLowerCase().trim();
     return data.filter((item) =>
       keys.some((key) => (item as any)[key]?.toLowerCase().includes(query))
@@ -157,13 +141,11 @@ export default function Olt() {
 
   const rows = sortedData?.map((item) => (
     <tr key={item.id}>
-      <td>{item.name}</td>
-      <td>{item.ip}</td>
-      <td>{item.olt_type}</td>
-      <td>{formatDate(item.created_at)}</td>
-      <td>{formatDate(item.updated_at)}</td>
       <td>
-        <Group spacing={0} position="right">
+        <Center>{item.phone}</Center>
+      </td>
+      <td>
+        <Group spacing={0} position="right" noWrap>
           <ActionIcon
             onClick={() => {
               edit(item);
@@ -178,7 +160,6 @@ export default function Olt() {
       </td>
     </tr>
   ));
-
   return (
     <>
       <Group position="apart" noWrap>
@@ -195,24 +176,22 @@ export default function Olt() {
           sx={{ width: 150 }}
           onClick={() => {
             form.reset();
-            setOlt(undefined);
+            setPhone(undefined);
             setOpened(true);
           }}
           leftIcon={<Plus size={18} />}
         >
-          OLT
+          Telefone
         </Button>
       </Group>
       <ScrollArea sx={{ height: "calc(100vh - 90px)" }} offsetScrollbars>
-        <Table sx={{ minWidth: 800 }} verticalSpacing="sm" highlightOnHover>
+        <Table sx={{ width: 300 }} verticalSpacing="sm" highlightOnHover>
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>IP</th>
-              <th>Tipo</th>
-              <th>Criado</th>
-              <th>Atualizado</th>
-              <th />
+              <th>
+                <Center>Telefone</Center>
+              </th>
+              <th></th>
             </tr>
           </thead>
           <tbody>{rows}</tbody>
@@ -220,17 +199,18 @@ export default function Olt() {
         <Modal
           opened={opened}
           onClose={() => setOpened(false)}
-          title={olt?.name}
+          title={<strong>{phone?.phone}</strong>}
           withCloseButton={false}
+          overlayOpacity={0.55}
+          overlayBlur={2}
+          size="md"
         >
           <form onSubmit={form.onSubmit(handleSubmit)}>
-            <TextInput label="Nome" {...form.getInputProps("name")} />
-            <TextInput label="IP" {...form.getInputProps("ip")} />
-            <Select
-              data={types}
-              searchable
-              label="Tipo"
-              {...form.getInputProps("olt_type")}
+            <TextInput
+              label="Telefone"
+              type="number"
+              {...form.getInputProps("phone")}
+              required
             />
             <Group position="right" sx={{ marginTop: 20 }}>
               <Button color="gray" onClick={() => setOpened(false)}>

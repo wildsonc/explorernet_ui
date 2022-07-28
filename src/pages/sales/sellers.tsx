@@ -2,24 +2,18 @@ import {
   ActionIcon,
   Anchor,
   Avatar,
-  Badge,
-  Button,
+  Badge, Box, Button,
   Center,
-  Group,
-  Modal,
-  ScrollArea,
-  Table,
+  Group, Loader, Modal,
+  ScrollArea, Switch, Table,
   Text,
   TextInput,
-  useMantineTheme,
-  Loader,
-  Switch,
-  Box,
+  useMantineTheme
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import {
@@ -31,7 +25,7 @@ import {
   Refresh,
   Rotate2,
   Search,
-  User,
+  User
 } from "tabler-icons-react";
 import NotAuthorized from "../../components/ErrorPage/NotAuthorized";
 import api from "../../services/api";
@@ -86,6 +80,10 @@ export default function Seller() {
     }
   );
 
+  useEffect(() => {
+    if (data) setSortedData(data);
+  }, [data]);
+
   if (!data) {
     return (
       <Center>
@@ -93,7 +91,6 @@ export default function Seller() {
       </Center>
     );
   }
-  if (!sortedData) setSortedData(data);
 
   const roles = accessTokenPayload.roles;
 

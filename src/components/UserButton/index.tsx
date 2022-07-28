@@ -1,20 +1,19 @@
+import {
+  Box,
+  createStyles,
+  Divider,
+  Group,
+  Kbd,
+  Menu,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
+import { useDisclosure, useOs } from "@mantine/hooks";
+import { openSpotlight } from "@mantine/spotlight";
+import { useRouter } from "next/router";
 import React from "react";
 import { signOut } from "supertokens-auth-react/recipe/thirdpartyemailpassword";
-import {
-  Menu,
-  Group,
-  Text,
-  Avatar,
-  Divider,
-  useMantineTheme,
-  createStyles,
-  Box,
-  Kbd,
-} from "@mantine/core";
-import { Logout, Settings, Bell, Search } from "tabler-icons-react";
-import { openSpotlight } from "@mantine/spotlight";
-import { useDisclosure, useOs } from "@mantine/hooks";
-import { useRouter } from "next/router";
+import { Bell, Logout, Search, Settings } from "tabler-icons-react";
 
 const useStyles = createStyles((theme) => ({
   user: {
@@ -24,6 +23,7 @@ const useStyles = createStyles((theme) => ({
     color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
 
     "&:hover": {
+      cursor: "pointer",
       backgroundColor:
         theme.colorScheme === "dark"
           ? theme.colors.dark[8]
@@ -85,7 +85,6 @@ export function UserButton({ name, email, icon, ...others }: UserButtonProps) {
           >
             Notificações
           </Menu.Item>
-
           <Menu.Item icon={<Search size={14} />} onClick={openSpotlight}>
             <Group position="apart">
               <span>Buscar </span>
@@ -105,6 +104,11 @@ export function UserButton({ name, email, icon, ...others }: UserButtonProps) {
           <Menu.Item icon={<Logout size={14} />} onClick={onLogout}>
             Sair
           </Menu.Item>
+          <Menu.Label>
+            <Text align="right" size="xs" mt={-9}>
+              v0.6.41
+            </Text>
+          </Menu.Label>
         </Menu>
       </Group>
     </Box>

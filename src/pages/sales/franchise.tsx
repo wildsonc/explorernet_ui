@@ -88,6 +88,10 @@ export default function Franchise() {
     });
   }, []);
 
+  useEffect(() => {
+    if (data) setSortedData(data);
+  }, [data]);
+
   if (!data) {
     return (
       <Center>
@@ -95,7 +99,6 @@ export default function Franchise() {
       </Center>
     );
   }
-  if (!sortedData) setSortedData(data);
 
   const roles = accessTokenPayload.roles;
 

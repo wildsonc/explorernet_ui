@@ -537,6 +537,12 @@ export default function Bot() {
           />
           <Divider mt={15} />
           <AutoSaveMarkdownTextarea
+            label="Finalizado"
+            name="BOT_MSG_FINISHED"
+            mt={10}
+          />
+          <Divider mt={15} />
+          <AutoSaveMarkdownTextarea
             label="Manutenção"
             name="BOT_MSG_MAINTENANCE"
             mt={10}

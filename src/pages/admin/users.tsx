@@ -116,6 +116,10 @@ export default function UsersTable() {
     }
   );
 
+  useEffect(() => {
+    if (data) setSortedData(data);
+  }, [data]);
+
   if (!data) {
     return (
       <Center>
@@ -123,7 +127,6 @@ export default function UsersTable() {
       </Center>
     );
   }
-  if (!sortedData) setSortedData(data);
   if (!groups) return <></>;
 
   const roles = accessTokenPayload.roles;
